@@ -7,12 +7,12 @@
 #include "i2c.h"
 #include "linux/i2c-dev.h"
 
-I2c::I2c(): Connector("Unknown")
+I2c::I2c(): Connector("Unknown", "/dev/null")
 {
     std::cout << "Creating I2C device" << std::endl;
 }
 
-I2c::I2c(std::string name): Connector(name)
+I2c::I2c(std::string connector, std::string device): Connector(connector, device)
 {
     std::cout << "Creating I2C device" << std::endl;
 }

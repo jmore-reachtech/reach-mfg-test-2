@@ -121,13 +121,13 @@ int main(int argc, char **argv)
         for (auto t: connector_tests) {
             std::cout << t << std::endl;
             if (t == "AUART1")
-                connectors.push_back(new Uart("J2"));
+                connectors.push_back(new Uart("J2", "/dev/ttymxc1"));
             if (t == "AUART2")
-                connectors.push_back(new Uart("J21"));
+                connectors.push_back(new Uart("J21", "/dev/ttymxc3"));
             if (t == "AUART3")
-                connectors.push_back(new Uart("J25"));
+                connectors.push_back(new Uart("J25", "/dev/ttymxc4"));
             if (t == "I2C")
-                connectors.push_back(new I2c("J21"));
+                connectors.push_back(new I2c("J21", "/dev/i2c-1"));
         }
     }
 

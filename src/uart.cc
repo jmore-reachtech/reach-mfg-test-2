@@ -8,14 +8,15 @@
 
 #include "uart.h"
 
-Uart::Uart(): Connector("Unknown")
+Uart::Uart(): Connector("Unknown", "/dev/null")
 {
     std::cout << "Creating UART port" << std::endl; 
 }
 
-Uart::Uart(std::string name): Connector(name)
+Uart::Uart(std::string connector, std::string device): Connector(connector, device)
 {
-    std::cout << "Creating UART for " << name << std::endl; 
+    std::cout << "Creating UART conector " << connector 
+        << " using device" << device << std::endl; 
 }
 
 Uart::~Uart()
@@ -39,13 +40,13 @@ bool Uart::Test()
     tcs.c_cc[VMIN] = 1;
     tcs.c_cc[VTIME] = 5;
 
-    fd = open("/dev/ttymxc3", O_RDWR);
+    fd = open(GetDevice().c_str(), O_RDWR);
     if (fd < 0) {
-        std::cout << "Error opening /dev/ttymxc3: " << errno << std::endl;
+        std::cout << "Error opening: " << GetDevice()  << errno << std::endl;
         return false;
     }
 
-    std::cout << "Opened /dev/ttymxc3" << std::endl;
+    std::cout << "Opened " << GetDevice() << std::endl;
 
     close(fd);
 

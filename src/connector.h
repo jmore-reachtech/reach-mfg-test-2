@@ -7,13 +7,15 @@ class Connector
 {
 
 public:
-    Connector(std::string name);
+    Connector(std::string name, std::string device);
     virtual ~Connector();
 
     virtual bool Test() = 0;
+    std::string GetDevice() const;
 
 private:
-    std::string _name;
+    std::string m_device;
+    std::string m_name;
 };
 
 #endif

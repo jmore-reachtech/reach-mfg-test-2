@@ -8,7 +8,7 @@ class I2c: public Connector
 
 public:
     I2c();
-    I2c(std::string name);
+    I2c(std::string connector, std::string device);
     virtual ~I2c();
 
     virtual bool Test();

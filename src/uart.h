@@ -9,13 +9,12 @@ class Uart: public Connector {
 
 public:
     Uart();
-    Uart(std::string name);
+    Uart(std::string connector, std::string device);
     virtual ~Uart();
 
     virtual bool Test();
 
 private:
-
 };
 
 #endif 
