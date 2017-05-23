@@ -12,6 +12,7 @@ public:
 
     virtual bool Test() = 0;
     std::string GetDevice() const;
+    std::string GetName() const;
 
 private:
     std::string m_device;

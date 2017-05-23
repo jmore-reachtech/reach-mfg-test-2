@@ -7,6 +7,8 @@
 
 #include "uart.h"
 #include "i2c.h"
+#include "can.h"
+#include "ethernet.h"
 
 static void showUsage(std::string name)
 {
@@ -52,10 +54,10 @@ int main(int argc, char **argv)
 {
     auto opt_index  = 0;
     auto opt        = 0;
+    auto verbose    = false;
     std::string tests;
     std::string image;
     std::string mac;
-    auto verbose    = false;
     std::vector<Connector*> connectors;
     std::vector<std::string> connector_tests;
 
@@ -128,6 +130,10 @@ int main(int argc, char **argv)
                 connectors.push_back(new Uart("J25", "/dev/ttymxc4"));
             if (t == "I2C")
                 connectors.push_back(new I2c("J21", "/dev/i2c-1"));
+            if (t == "CAN")
+                connectors.push_back(new Can("J20", "can0"));
+            if (t == "ETHERNET")
+                connectors.push_back(new Ethernet("J3", "eth0"));
         }
     }
 
@@ -140,8 +146,6 @@ int main(int argc, char **argv)
             delete c;
         }
     }
-
-
 
     return 0;
 }

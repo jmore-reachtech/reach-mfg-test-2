@@ -17,3 +17,8 @@ std::string Connector::GetDevice() const
 {
     return m_device;
 }
+
+std::string Connector::GetName() const
+{
+    return m_name;
+}

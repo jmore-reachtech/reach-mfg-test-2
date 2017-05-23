@@ -28,9 +28,9 @@ bool I2c::Test()
     int fd = 0;
     int rv = 0;
 
-    fd = open("/dev/i2c-0", O_RDWR);
+    fd = open(GetDevice().c_str(), O_RDWR);
     if (fd < 0) {
-        std::cout << "Error opening /dev/i2c-0: " << errno << std::endl;
+        std::cout << "Error opening " << GetDevice() << errno << std::endl;
         return false;
     }
 
