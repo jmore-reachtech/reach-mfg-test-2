@@ -10,6 +10,7 @@
 #include "can.h"
 #include "ethernet.h"
 #include "usb.h"
+#include "gpio.h"
 
 static void showUsage(std::string name)
 {
@@ -139,6 +140,8 @@ int main(int argc, char **argv)
                 connectors.push_back(new Usb("J4", "usb1"));
             if (t == "USB2")
                 connectors.push_back(new Usb("J5", "usb2"));
+            if (t == "GPIO")
+                connectors.push_back(new Gpio("J22", "gpio"));
         }
     }
 
