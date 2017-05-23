@@ -123,25 +123,51 @@ int main(int argc, char **argv)
     if (tests.size() != 0) {
         connector_tests = split(tests);
         for (auto t: connector_tests) {
-            std::cout << t << std::endl;
-            if (t == "AUART1")
+            if (t == "AUART1") {
                 connectors.push_back(new Uart("J2", "/dev/ttymxc1"));
-            if (t == "AUART2")
+                continue;
+            }
+            if (t == "AUART2") {
                 connectors.push_back(new Uart("J21", "/dev/ttymxc3"));
-            if (t == "AUART3")
+                continue;
+            }
+            if (t == "AUART3") {
                 connectors.push_back(new Uart("J25", "/dev/ttymxc4"));
-            if (t == "I2C")
+                continue;
+            }
+            if (t == "I2C") {
                 connectors.push_back(new I2c("J21", "/dev/i2c-1"));
-            if (t == "CAN")
+                continue;
+            }
+            if (t == "CAN") {
                 connectors.push_back(new Can("J20", "can0"));
-            if (t == "ETHERNET")
+                continue;
+            }
+            if (t == "ETHERNET") {
                 connectors.push_back(new Ethernet("J3", "eth0"));
-            if (t == "USB1")
+                continue;
+            }
+            if (t == "USB1") {
                 connectors.push_back(new Usb("J4", "usb1"));
-            if (t == "USB2")
+                continue;
+            }
+            if (t == "USB2") {
                 connectors.push_back(new Usb("J5", "usb2"));
-            if (t == "GPIO")
+                continue;
+            }
+            if (t == "GPIO") {
                 connectors.push_back(new Gpio("J22", "gpio"));
+                continue;
+            }
+
+            /* Invalid test */
+            std::cout << "Invalid test: " << t << std::endl;
+
+            for(auto c: connectors) {
+                delete c;
+            }
+
+            return 1;
         }
     }
 
