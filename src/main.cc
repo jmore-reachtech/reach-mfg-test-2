@@ -9,6 +9,7 @@
 #include "i2c.h"
 #include "can.h"
 #include "ethernet.h"
+#include "usb.h"
 
 static void showUsage(std::string name)
 {
@@ -134,6 +135,10 @@ int main(int argc, char **argv)
                 connectors.push_back(new Can("J20", "can0"));
             if (t == "ETHERNET")
                 connectors.push_back(new Ethernet("J3", "eth0"));
+            if (t == "USB1")
+                connectors.push_back(new Usb("J4", "usb1"));
+            if (t == "USB2")
+                connectors.push_back(new Usb("J5", "usb2"));
         }
     }
 

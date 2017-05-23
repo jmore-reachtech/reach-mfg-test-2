@@ -11,7 +11,7 @@ Can::Can(): Connector("Unknown", "/dev/null")
 Can::Can(std::string connector, std::string device): Connector(connector, device)
 {
     std::cout << "Creating CAN conector " << connector 
-        << " using device" << device << std::endl; 
+        << " using device " << device << std::endl; 
 }
 
 Can::~Can()

@@ -11,7 +11,7 @@ Ethernet::Ethernet(): Connector("Unknown", "/dev/null")
 Ethernet::Ethernet(std::string connector, std::string device): Connector(connector, device)
 {
     std::cout << "Creating ETHERNET conector " << connector 
-        << " using device" << device << std::endl; 
+        << " using device " << device << std::endl; 
 }
 
 Ethernet::~Ethernet()
