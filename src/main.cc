@@ -33,129 +33,131 @@ std::vector<std::string> split(std::string s)
     ss.str(s);
     std::string item;
 
-    while (std::getline(ss,item,',')) {
+    while(std::getline(ss, item, ',')) {
         items.push_back(item);
     }
 
     return items;
 }
 
-static const char *short_opts = "vht:";
+static const char* short_opts = "vht:";
 static const struct option long_opts[] = {
-    { "tests",       required_argument,  0, 't' },
-    { "mac-address", required_argument,  0, 'm' },
-    { "list-tests",  no_argument,        0, 0 },
-    { "verbose",     no_argument,        0, 'v' },
-    { "help",        no_argument,        0, 'h' },
-    { "splash",      optional_argument,  0, 0 },
-    { "version",     no_argument,        0, 0 },
+    { "tests", required_argument, 0, 't' },
+    { "mac-address", required_argument, 0, 'm' },
+    { "list-tests", no_argument, 0, 0 },
+    { "verbose", no_argument, 0, 'v' },
+    { "help", no_argument, 0, 'h' },
+    { "splash", optional_argument, 0, 0 },
+    { "version", no_argument, 0, 0 },
     { 0, 0, 0, 0 },
 };
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
-    auto opt_index  = 0;
-    auto opt        = 0;
-    auto verbose    = false;
+    auto opt_index = 0;
+    auto opt = 0;
+    auto verbose = false;
+    auto rv = 0;
     std::string tests;
     std::string image;
     std::string mac;
     std::vector<Connector*> connectors;
     std::vector<std::string> connector_tests;
 
-    if (argc == 1) {
+    if(argc == 1) {
         showUsage(argv[0]);
 
         return 1;
     }
 
-    while ((opt = getopt_long(argc, argv, short_opts, long_opts, &opt_index)) != -1) {
-        switch (opt) {
-            case 0:
-                switch (opt_index) {
-                    case 0: // --tests
-                        break;
-                    case 1: // --mac-address
-                        break;
-                    case 2: // --list-tests
-                        std::cout << "list tests long" << std::endl;
-                        break;
-                    case 3: // --verbose
-                        break;
-                    case 4: // --help
-                        break;
-                    case 5: // --splash
-                        std::cout << "Splash long";
-                        if (optarg) {
-                            image = strdup(optarg);
-                        }
-                        std::cout << image << std::endl;
-                        return 0;
-                    case 6: // --version
-                        std::cout << "Version 1.1.1" << std::endl;
-                        return 0;
-                    default:
-                        return 1;
-                } break;
-            case 't': // --tests
-                if (optarg) {
-                    tests = strdup(optarg);
-                }
+    while((opt = getopt_long(argc, argv, short_opts, long_opts, &opt_index)) != -1) {
+        switch(opt) {
+        case 0:
+            switch(opt_index) {
+            case 0: // --tests
                 break;
-            case 'm': // --mac-address
-                if (optarg) {
-                    mac = strdup(optarg);
-                }
+            case 1: // --mac-address
                 break;
-            case 'v': // --verbose
-                verbose = true;
-                break;
-            case 'h': // --help
-                showUsage(argv[0]);
+            case 2: // --list-tests
+                std::cout << "list tests long" << std::endl;
                 return 0;
-            case '?': // error on long opt
+            case 3: // --verbose
                 break;
+            case 4: // --help
+                break;
+            case 5: // --splash
+                std::cout << "Splash long";
+                if(optarg) {
+                    image = strdup(optarg);
+                }
+                std::cout << image << std::endl;
+                return 0;
+            case 6: // --version
+                std::cout << "Version 1.1.1" << std::endl;
+                return 0;
             default:
                 return 1;
+            }
+            break;
+        case 't': // --tests
+            if(optarg) {
+                tests = strdup(optarg);
+            }
+            break;
+        case 'm': // --mac-address
+            if(optarg) {
+                mac = strdup(optarg);
+            }
+            return 0;
+        case 'v': // --verbose
+            verbose = true;
+            break;
+        case 'h': // --help
+            showUsage(argv[0]);
+            return 0;
+        case '?': // error on long opt
+            break;
+        default:
+            return 1;
         }
     }
 
-    if (tests.size() != 0) {
+    if(tests.size() != 0) {
         connector_tests = split(tests);
-        for (auto t: connector_tests) {
-            if (t == "AUART1") {
+        for(auto t : connector_tests) {
+            if(t == "AUART1") {
                 connectors.push_back(new Uart("J2", "/dev/ttymxc1"));
                 continue;
             }
-            if (t == "AUART2") {
+            if(t == "AUART2") {
                 connectors.push_back(new Uart("J21", "/dev/ttymxc3"));
                 continue;
             }
-            if (t == "AUART3") {
+            if(t == "AUART3") {
                 connectors.push_back(new Uart("J25", "/dev/ttymxc4"));
                 continue;
             }
-            if (t == "I2C") {
+            if(t == "I2C") {
                 connectors.push_back(new I2c("J21", "/dev/i2c-1"));
                 continue;
             }
-            if (t == "CAN") {
+            if(t == "CAN") {
                 connectors.push_back(new Can("J20", "can0"));
                 continue;
             }
-            if (t == "ETHERNET") {
+            if(t == "ETHERNET") {
                 connectors.push_back(new Ethernet("J3", "eth0"));
                 continue;
             }
-            if (t == "USB1") {
-                connectors.push_back(new Usb("J4", "usb1"));
+            if(t == "USB1") {
+                connectors.push_back(new Usb("J4", "/dev/sda1"));
                 continue;
             }
-            if (t == "USB2") {
-                connectors.push_back(new Usb("J5", "usb2"));
+            if(t == "USB2") {
+                connectors.push_back(new Usb("J5", "/dev/sdb1"));
                 continue;
             }
-            if (t == "GPIO") {
+            if(t == "GPIO") {
                 connectors.push_back(new Gpio("J22", "gpio"));
                 continue;
             }
@@ -163,7 +165,7 @@ int main(int argc, char **argv)
             /* Invalid test */
             std::cout << "Invalid test: " << t << std::endl;
 
-            for(auto c: connectors) {
+            for(auto c : connectors) {
                 delete c;
             }
 
@@ -171,14 +173,17 @@ int main(int argc, char **argv)
         }
     }
 
-    if (verbose) {
-        for(auto c: connectors) {
-            c->Test();
-        }
+    for(auto c : connectors) {
+        rv = c->Test();
+    }
+    
+    for(auto c : connectors) {
+        std::cout << "Connector: " << c->GetName() << std::endl;
+        std::cout << "Status: " << c->get_connector_result().rv << std::endl << std::endl;
+    }
 
-        for(auto c: connectors) {
-            delete c;
-        }
+    for(auto c : connectors) {
+        delete c;
     }
 
     return 0;
