@@ -2,6 +2,7 @@
 #include <sstream>
 #include <vector>
 #include <string>
+#include <fstream>
 #include <getopt.h>
 #include <string.h>
 
@@ -42,27 +43,28 @@ std::vector<std::string> split(std::string s)
 
 static const char* short_opts = "vht:";
 static const struct option long_opts[] = {
-    { "tests", required_argument, 0, 't' },
-    { "mac-address", required_argument, 0, 'm' },
-    { "list-tests", no_argument, 0, 0 },
-    { "verbose", no_argument, 0, 'v' },
-    { "help", no_argument, 0, 'h' },
-    { "splash", optional_argument, 0, 0 },
-    { "version", no_argument, 0, 0 },
+    { "tests",          required_argument, 0, 't' },
+    { "mac-address",    required_argument, 0, 'm' },
+    { "list-tests",     no_argument,       0, 0 },
+    { "verbose",        no_argument,       0, 'v' },
+    { "help",           no_argument,       0, 'h' },
+    { "splash",         optional_argument, 0, 0 },
+    { "version",        no_argument,       0, 0 },
     { 0, 0, 0, 0 },
 };
 
 int main(int argc, char** argv)
 {
-    auto opt_index = 0;
-    auto opt = 0;
-    auto verbose = false;
-    auto rv = 0;
+    auto opt_index      = 0;
+    auto opt            = 0;
+    auto verbose        = false;
+    auto rv             = 0;
     std::string tests;
     std::string image;
     std::string mac;
     std::vector<Connector*> connectors;
     std::vector<std::string> connector_tests;
+    std::fstream fs;
 
     if(argc == 1) {
         showUsage(argv[0]);
@@ -173,6 +175,7 @@ int main(int argc, char** argv)
         }
     }
 
+    fs.open("test_log.txt", std::fstream::out | std::fstream::trunc);
     for(auto c : connectors) {
         rv = c->Test();
     }
@@ -180,11 +183,17 @@ int main(int argc, char** argv)
     for(auto c : connectors) {
         std::cout << "Connector: " << c->GetName() << std::endl;
         std::cout << "Status: " << c->get_connector_result().rv << std::endl << std::endl;
+        
+        fs << "Connector: " << c->GetName() << std::endl;
+        fs << "Status: " << c->get_connector_result().rv << std::endl;
+        fs << "**********************" << std::endl;
+        fs << "Output: " << c->get_connector_result().output << std::endl << std::endl;
     }
 
     for(auto c : connectors) {
         delete c;
     }
+    fs.close();
 
     return 0;
 }
