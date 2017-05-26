@@ -14,6 +14,7 @@
 #include "gpio.h"
 #include "lcd.h"
 #include "touch.h"
+#include "flash.h"
 
 static void showUsage(std::string name)
 {
@@ -129,6 +130,10 @@ int main(int argc, char** argv)
     if(tests.size() != 0) {
         connector_tests = split(tests);
         for(auto t : connector_tests) {
+            if(t == "TOUCH") {
+                connectors.push_back(new Touch("J0", "/dev/input/touchscreen0"));
+                continue;
+            }
             if(t == "AUART1") {
                 connectors.push_back(new Uart("J2", "/dev/ttymxc1"));
                 continue;
@@ -165,12 +170,12 @@ int main(int argc, char** argv)
                 connectors.push_back(new Gpio("J22", "gpio"));
                 continue;
             }
-            if(t == "LCD") {
-                connectors.push_back(new Lcd("J0", "/dev/fb0"));
+            if(t == "FLASH") {
+                connectors.push_back(new Flash("J0", "/dev/mtd0"));
                 continue;
             }
-            if(t == "TOUCH") {
-                connectors.push_back(new Touch("J0", "/dev/input/touchscreen0"));
+            if(t == "LCD") {
+                connectors.push_back(new Lcd("J0", "/dev/fb0"));
                 continue;
             }
 
@@ -187,10 +192,19 @@ int main(int argc, char** argv)
 
     fs.open("test_log.txt", std::fstream::out | std::fstream::trunc);
     for(auto c : connectors) {
+        std::cout << "Testing: " << c->GetName() << " ";
         rv = c->Test();
+        std::cout << rv << std::endl;
+        
+        /* save to test log */
+        fs << "Connector: " << c->GetName() << std::endl;
+        fs << "Status: " << c->get_connector_result().rv << std::endl;
+        fs << "**********************" << std::endl;
+        fs << "Output: " << c->get_connector_result().output << std::endl << std::endl;
     }
+    std::cout << std::endl << "Test Complete" << std::endl;
     
-    for(auto c : connectors) {
+    /*for(auto c : connectors) {
         std::cout << "Connector: " << c->GetName() << std::endl;
         std::cout << "Status: " << c->get_connector_result().rv << std::endl << std::endl;
         
@@ -198,11 +212,13 @@ int main(int argc, char** argv)
         fs << "Status: " << c->get_connector_result().rv << std::endl;
         fs << "**********************" << std::endl;
         fs << "Output: " << c->get_connector_result().output << std::endl << std::endl;
-    }
+    }*/
 
     for(auto c : connectors) {
         delete c;
     }
+    
+    /* close test log */
     fs.close();
 
     return 0;

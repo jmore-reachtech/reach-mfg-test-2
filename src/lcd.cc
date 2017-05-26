@@ -50,19 +50,19 @@ bool Lcd::Test()
     fbfd = open("/dev/fb0", O_RDWR);
     if (fbfd == -1) {
         //perror("Error: cannot open framebuffer device");
-        return false;
+        return true;
     }
 
     /* Get fixed screen information */
     if (ioctl(fbfd, FBIOGET_FSCREENINFO, &finfo) == -1) {
         //perror("Error reading fixed information");
-        return false;
+        return true;
     }
 
     /* Get variable screen information */
     if (ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo) == -1) {
         //perror("Error reading variable information");
-        return false;
+        return true;
     }
 
     /* Figure out the size of the screen in bytes */
@@ -75,7 +75,7 @@ bool Lcd::Test()
     fbp = (char *)mmap(0, screensize, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
     if ((int)fbp == -1) {
         //perror("Error: failed to map framebuffer device to memory");
-        return false;
+        return true;
     }
     
     if(!(image = fopen("/usr/share/mfg-test/fruit_girl.bmp", "rb+")))
@@ -83,10 +83,10 @@ bool Lcd::Test()
         //printf("Error opening image file!\n");
         munmap(fbp, screensize);
         close(fbfd);
-        return false;
+        return true;
     }
     
-        fread(&bfh.magic,2,1,image);
+    fread(&bfh.magic,2,1,image);
     
     fseek(image,2,SEEK_SET);
     fread(&bfh.filesz,4,1,image);
@@ -177,6 +177,6 @@ bool Lcd::Test()
     munmap(fbp, screensize);
     close(fbfd);
 
-    return true;
+    return false;
 }
 

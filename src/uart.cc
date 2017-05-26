@@ -47,7 +47,7 @@ bool Uart::Test()
     if (fd < 0) {
         if (verbose_)
             std::cout << "Error opening: " << GetDevice()  << errno << std::endl;
-        return false;
+        return true;
         
     }
 
@@ -56,5 +56,5 @@ bool Uart::Test()
 
     close(fd);
 
-    return true;
+    return false;
 }

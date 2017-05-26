@@ -10,18 +10,20 @@ Gpio::Gpio(): Connector("Unknown", "/dev/null")
 
 Gpio::Gpio(std::string connector, std::string device): Connector(connector, device)
 {
-    std::cout << "Creating GPIO conector " << connector 
-        << " using device " << device << std::endl; 
+    if (verbose_)
+        std::cout << "Creating GPIO conector " << connector << " using device " << device << std::endl; 
 }
 
 Gpio::~Gpio()
 {
-    std::cout << "Destroying GPIO port" << std::endl; 
+    if (verbose_)
+        std::cout << "Destroying GPIO port" << std::endl; 
 }
 
 bool Gpio::Test()
 {
-    std::cout << "Running GPIO Test" << std::endl;
+    if (verbose_)
+        std::cout << "Running GPIO Test" << std::endl;
 
-    return true;
+    return false;
 }

@@ -28,7 +28,7 @@ bool Touch::Test()
     std::string cmd;
 
     if (verbose_) {
-        std::cout << "Running USB Test" << std::endl;
+        std::cout << "Running Touch Test" << std::endl;
     }
 
     cmd.append("/usr/bin/ts_calibrate");
