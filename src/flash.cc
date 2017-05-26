@@ -26,7 +26,7 @@ Flash::~Flash()
 bool Flash::Test()
 {
     std::string cmd;
-    auto rv = true;
+    auto rv = false;
 
     if (verbose_) {
         std::cout << "Running Flash Test" << std::endl;
@@ -35,25 +35,25 @@ bool Flash::Test()
     result_.output.clear();
     
     cmd = "/usr/sbin/nandtest -m -o 0x0 /dev/mtd0";
-    if (!CmdRunner::Run(cmd,result_.output))
+    if (CmdRunner::Run(cmd,result_.output))
         return true;
     cmd = "/usr/sbin/nandtest -m -o 0x0 /dev/mtd1";
-    if (!CmdRunner::Run(cmd,result_.output))
+    if (CmdRunner::Run(cmd,result_.output))
         return true;
     cmd = "/usr/sbin/nandtest -m -o 0x0 /dev/mtd2";
-    if (!CmdRunner::Run(cmd,result_.output))
+    if (CmdRunner::Run(cmd,result_.output))
         return true;
     cmd = "/usr/sbin/nandtest -m -o 0x0 /dev/mtd3";
-    if (!CmdRunner::Run(cmd,result_.output))
+    if (CmdRunner::Run(cmd,result_.output))
         return true;
     cmd = "/usr/sbin/nandtest -m -o 0x0 /dev/mtd4";
-    if (!CmdRunner::Run(cmd,result_.output))
+    if (CmdRunner::Run(cmd,result_.output))
         return true;
     cmd = "/usr/sbin/nandtest -m -o 0x0 /dev/mtd5";
-    if (!CmdRunner::Run(cmd,result_.output))
+    if (CmdRunner::Run(cmd,result_.output))
         return true;
     cmd = "/usr/sbin/nandtest -m -o 0x0 /dev/mtd6";
-    if (!CmdRunner::Run(cmd,result_.output))
+    if (CmdRunner::Run(cmd,result_.output))
         return true;
 
     result_.rv = rv;

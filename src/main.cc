@@ -192,6 +192,7 @@ int main(int argc, char** argv)
 
     fs.open("test_log.txt", std::fstream::out | std::fstream::trunc);
     for(auto c : connectors) {
+        c->set_verbose(verbose);
         std::cout << "Testing: " << c->GetName() << " ";
         rv = c->Test();
         std::cout << rv << std::endl;
