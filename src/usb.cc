@@ -30,7 +30,7 @@ bool Usb::Test()
         std::cout << "Running USB Test" << std::endl;
     }
 
-    cmd.append("dd of=/dev/null if=");
+    cmd.append("/bin/dd of=/dev/null if=");
     cmd.append(GetDevice());
     cmd.append(" bs=1k count=64");
 

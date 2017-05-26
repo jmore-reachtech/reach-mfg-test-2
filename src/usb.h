@@ -1,5 +1,5 @@
-#ifndef USB_H
-#define USB_H
+#ifndef USB_H_
+#define USB_H_
 
 #include "connector.h"
 
@@ -17,4 +17,4 @@ private:
 
 };
 
-#endif
+#endif // USB_H_

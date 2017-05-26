@@ -13,6 +13,7 @@
 #include "usb.h"
 #include "gpio.h"
 #include "lcd.h"
+#include "touch.h"
 
 static void showUsage(std::string name)
 {
@@ -165,7 +166,11 @@ int main(int argc, char** argv)
                 continue;
             }
             if(t == "LCD") {
-                connectors.push_back(new Lcd("J14", "/dev/fb0"));
+                connectors.push_back(new Lcd("J0", "/dev/fb0"));
+                continue;
+            }
+            if(t == "TOUCH") {
+                connectors.push_back(new Touch("J0", "/dev/input/touchscreen0"));
                 continue;
             }
 
