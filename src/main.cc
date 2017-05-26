@@ -12,6 +12,7 @@
 #include "ethernet.h"
 #include "usb.h"
 #include "gpio.h"
+#include "lcd.h"
 
 static void showUsage(std::string name)
 {
@@ -58,7 +59,7 @@ int main(int argc, char** argv)
     auto opt_index      = 0;
     auto opt            = 0;
     auto verbose        = false;
-    auto rv             = 0;
+    auto rv             = false;
     std::string tests;
     std::string image;
     std::string mac;
@@ -161,6 +162,10 @@ int main(int argc, char** argv)
             }
             if(t == "GPIO") {
                 connectors.push_back(new Gpio("J22", "gpio"));
+                continue;
+            }
+            if(t == "LCD") {
+                connectors.push_back(new Lcd("J14", "/dev/fb0"));
                 continue;
             }
 
