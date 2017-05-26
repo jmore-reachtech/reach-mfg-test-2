@@ -10,23 +10,26 @@
 
 Uart::Uart(): Connector("Unknown", "/dev/null")
 {
-    std::cout << "Creating UART port" << std::endl; 
+    if (verbose_)
+        std::cout << "Creating UART port" << std::endl; 
 }
 
 Uart::Uart(std::string connector, std::string device): Connector(connector, device)
 {
-    std::cout << "Creating UART conector " << connector 
-        << " using device" << device << std::endl; 
+    if (verbose_)
+        std::cout << "Creating UART conector " << connector << " using device" << device << std::endl; 
 }
 
 Uart::~Uart()
 {
-    std::cout << "Destroying UART port" << std::endl; 
+    if (verbose_)
+        std::cout << "Destroying UART port" << std::endl; 
 }
 
 bool Uart::Test()
 {
-    std::cout << "Running UART Test" << std::endl;
+    if (verbose_)
+        std::cout << "Running UART Test" << std::endl;
 
     int fd = 0;
     struct termios tcs;
@@ -42,11 +45,14 @@ bool Uart::Test()
 
     fd = open(GetDevice().c_str(), O_RDWR);
     if (fd < 0) {
-        std::cout << "Error opening: " << GetDevice()  << errno << std::endl;
+        if (verbose_)
+            std::cout << "Error opening: " << GetDevice()  << errno << std::endl;
         return false;
+        
     }
 
-    std::cout << "Opened " << GetDevice() << std::endl;
+    if (verbose_)
+        std::cout << "Opened " << GetDevice() << std::endl;
 
     close(fd);
 
