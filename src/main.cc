@@ -204,16 +204,6 @@ int main(int argc, char** argv)
         fs << "Output: " << c->get_connector_result().output << std::endl << std::endl;
     }
     std::cout << std::endl << "Test Complete" << std::endl;
-    
-    /*for(auto c : connectors) {
-        std::cout << "Connector: " << c->GetName() << std::endl;
-        std::cout << "Status: " << c->get_connector_result().rv << std::endl << std::endl;
-        
-        fs << "Connector: " << c->GetName() << std::endl;
-        fs << "Status: " << c->get_connector_result().rv << std::endl;
-        fs << "**********************" << std::endl;
-        fs << "Output: " << c->get_connector_result().output << std::endl << std::endl;
-    }*/
 
     for(auto c : connectors) {
         delete c;
