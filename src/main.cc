@@ -181,7 +181,7 @@ int main(int argc, char** argv)
                 continue;
             }
             if(t == "GPIO") {
-                connectors.push_back(new Gpio("J22", "gpio"));
+                connectors.push_back(new Gpio("J22", "/dev/i2c-0"));
                 continue;
             }
             if(t == "FLASH") {

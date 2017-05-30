@@ -5,6 +5,12 @@
 
 #include "connector.h"
 
+#define INPUT_REG       0x00
+#define OUT_REG         0x01
+#define POLARITY_REG    0x02
+#define CTRL_REG        0x03
+#define GPIO_MASK       0x80
+
 class Gpio: public Connector {
 
 public:
@@ -15,6 +21,7 @@ public:
     virtual bool Test();
 
 private:
+    int fd_{0};
 };
 
 #endif 
