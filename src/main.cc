@@ -15,6 +15,7 @@
 #include "lcd.h"
 #include "touch.h"
 #include "flash.h"
+#include "rtc.h"
 
 static void showUsage(std::string name)
 {
@@ -196,6 +197,10 @@ int main(int argc, char** argv)
             }
             if(t == "LCD") {
                 connectors.push_back(new Lcd("J0", "/dev/fb0"));
+                continue;
+            }
+            if(t == "RTC") {
+                connectors.push_back(new Rtc("J3", "eth0", rtc_addr));
                 continue;
             }
 
