@@ -53,7 +53,7 @@ bool Gpio::Test()
     }
     
     /* setup CTRL_REG */
-    rv = i2c_smbus_write_byte_data(fd_, CTRL_REG, 0xF0);
+    rv = i2c_smbus_write_byte_data(fd_, GPIO_CTRL_REG, 0xF0);
     if(rv < 0) {
         std::cout << "Error setttng CTRL_REG: " << errno << std::endl;
         return true;
@@ -61,13 +61,13 @@ bool Gpio::Test()
     /* walk 1 over lower 4 bits  */
     for(x = 0; x < 4; x++) {
         /* write to the OUT_REG of the i2c device */	
-        rv = i2c_smbus_write_byte_data(fd_, OUT_REG, (0x1 << x));
+        rv = i2c_smbus_write_byte_data(fd_, GPIO_OUT_REG, (0x1 << x));
 		if(rv < 0) {
 			std::cout << "Error setttng OUT_REG: " << errno << std::endl;
 			return true;
 		}
         /* read the INPUT_REG register of the i2c device */
-		rv = i2c_smbus_read_byte_data(fd_, INPUT_REG);
+		rv = i2c_smbus_read_byte_data(fd_, GPIO_INPUT_REG);
 		if(rv < 0) {
 			std::cout << "Error setttng OUT_REG: " << errno << std::endl;
 			return true;
@@ -80,7 +80,7 @@ bool Gpio::Test()
     }
     
     /* setup CTRL_REG */
-    rv = i2c_smbus_write_byte_data(fd_, CTRL_REG, 0x0F);
+    rv = i2c_smbus_write_byte_data(fd_, GPIO_CTRL_REG, 0x0F);
     if(rv < 0) {
         std::cout << "Error setttng CTRL_REG: " << errno << std::endl;
         return true;
@@ -88,13 +88,13 @@ bool Gpio::Test()
     /* walk 1 over upper 4 bits  */
     for(x = 7; x > 3; x--) {
         /* write to the OUT_REG of the i2c device */	
-        rv = i2c_smbus_write_byte_data(fd_, OUT_REG, (0x1 << x));
+        rv = i2c_smbus_write_byte_data(fd_, GPIO_OUT_REG, (0x1 << x));
 		if(rv < 0) {
 			std::cout << "Error setttng OUT_REG: " << errno << std::endl;
 			return true;
 		}
         /* read the INPUT_REG register of the i2c device */
-		rv = i2c_smbus_read_byte_data(fd_, INPUT_REG);
+		rv = i2c_smbus_read_byte_data(fd_, GPIO_INPUT_REG);
 		if(rv < 0) {
 			std::cout << "Error setttng OUT_REG: " << errno << std::endl;
 			return true;

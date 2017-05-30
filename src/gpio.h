@@ -5,11 +5,11 @@
 
 #include "connector.h"
 
-#define INPUT_REG       0x00
-#define OUT_REG         0x01
-#define POLARITY_REG    0x02
-#define CTRL_REG        0x03
-#define GPIO_MASK       0x80
+#define GPIO_INPUT_REG      0x00
+#define GPIO_OUT_REG        0x01
+#define GPIO_POLARITY_REG   0x02
+#define GPIO_CTRL_REG       0x03
+#define GPIO_MASK           0x80
 
 class Gpio: public Connector {
 
