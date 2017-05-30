@@ -5,6 +5,7 @@
 #include <fstream>
 #include <getopt.h>
 #include <string.h>
+#include <cstdlib>
 
 #include "uart.h"
 #include "i2c.h"
@@ -27,8 +28,6 @@ static void showUsage(std::string name)
     std::cout << "  -t, --tests                         Tests to run" << std::endl;
     std::cout << "      --list-tests                    Display this help and exit" << std::endl;
     std::cout << "      --mac-address                   Burn in MAC address" << std::endl;
-    std::cout << "      --server-address                HTTP server address" << std::endl;
-    std::cout << "      --rtc-address                   Time server address" << std::endl;
     std::cout << "      --splash                        Splash image to panel" << std::endl;
     std::cout << "      --version                       Display Program version" << std::endl << std::endl;
 }
@@ -56,8 +55,6 @@ static const struct option long_opts[] = {
     { "help",           no_argument,       0, 'h' },
     { "splash",         optional_argument, 0, 0 },
     { "version",        no_argument,       0, 0 },
-    { "server-address", required_argument, 0, 's' },
-    { "rtc-address",    required_argument, 0, 'r' },
     { 0, 0, 0, 0 },
 };
 
@@ -67,14 +64,23 @@ int main(int argc, char** argv)
     auto opt            = 0;
     auto verbose        = false;
     auto rv             = false;
-    auto server_addr    = "";
-    auto rtc_addr       = "";
     std::string tests;
     std::string image;
     std::string mac;
     std::vector<Connector*> connectors;
     std::vector<std::string> connector_tests;
     std::fstream fs;
+    
+    /* pull server vars from env */
+    auto server_addr    = "";
+    auto rtc_addr       = "";
+    
+    if(const char* env_p = std::getenv("TEST_WEB_SERVER_ADDR")) {
+        server_addr = env_p;
+    }
+    if(const char* env_p = std::getenv("TEST_RTC_SERVER_ADDR")) {
+        rtc_addr = env_p;
+    }
 
     if(argc == 1) {
         showUsage(argv[0]);
@@ -82,6 +88,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
+    
     while((opt = getopt_long(argc, argv, short_opts, long_opts, &opt_index)) != -1) {
         switch(opt) {
         case 0:
@@ -107,10 +114,6 @@ int main(int argc, char** argv)
             case 6: // --version
                 std::cout << "Version 1.1.1" << std::endl;
                 return 0;
-            case 7: // --server-address
-                break;
-            case 8: // --rtc-address
-                break;
             default:
                 return 1;
             }
@@ -125,16 +128,6 @@ int main(int argc, char** argv)
                 mac = strdup(optarg);
             }
             return 0;
-        case 's': // --server-address
-            if(optarg) {
-                server_addr = strdup(optarg);
-            }
-            break;
-        case 'r': // --rtc-address
-            if(optarg) {
-                rtc_addr = strdup(optarg);
-            }
-            break;
         case 'v': // --verbose
             verbose = true;
             break;
