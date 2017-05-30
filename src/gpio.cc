@@ -62,21 +62,21 @@ bool Gpio::Test()
     for(x = 0; x < 4; x++) {
         /* write to the OUT_REG of the i2c device */	
         rv = i2c_smbus_write_byte_data(fd_, GPIO_OUT_REG, (0x1 << x));
-		if(rv < 0) {
-			std::cout << "Error setttng OUT_REG: " << errno << std::endl;
-			return true;
-		}
+        if(rv < 0) {
+            std::cout << "Error setttng OUT_REG: " << errno << std::endl;
+            return true;
+        }
         /* read the INPUT_REG register of the i2c device */
-		rv = i2c_smbus_read_byte_data(fd_, GPIO_INPUT_REG);
-		if(rv < 0) {
-			std::cout << "Error setttng OUT_REG: " << errno << std::endl;
-			return true;
-		}
+        rv = i2c_smbus_read_byte_data(fd_, GPIO_INPUT_REG);
+        if(rv < 0) {
+            std::cout << "Error setttng OUT_REG: " << errno << std::endl;
+            return true;
+    }
         /* check for valid bit */
         if(((GPIO_MASK >> x) != (rv & (GPIO_MASK >> x)))) {
-			std::cout << "Error reading INPUT_REG: " << errno << std::endl;
-			return true;
-		}
+            std::cout << "Error reading INPUT_REG: " << errno << std::endl;
+            return true;
+        }
     }
     
     /* setup CTRL_REG */
@@ -89,21 +89,21 @@ bool Gpio::Test()
     for(x = 7; x > 3; x--) {
         /* write to the OUT_REG of the i2c device */	
         rv = i2c_smbus_write_byte_data(fd_, GPIO_OUT_REG, (0x1 << x));
-		if(rv < 0) {
-			std::cout << "Error setttng OUT_REG: " << errno << std::endl;
-			return true;
-		}
+        if(rv < 0) {
+            std::cout << "Error setttng OUT_REG: " << errno << std::endl;
+            return true;
+        }
         /* read the INPUT_REG register of the i2c device */
-		rv = i2c_smbus_read_byte_data(fd_, GPIO_INPUT_REG);
-		if(rv < 0) {
-			std::cout << "Error setttng OUT_REG: " << errno << std::endl;
-			return true;
-		}
+        rv = i2c_smbus_read_byte_data(fd_, GPIO_INPUT_REG);
+        if(rv < 0) {
+            std::cout << "Error setttng OUT_REG: " << errno << std::endl;
+        return true;
+        }
         /* check for valid bit */
         if(((GPIO_MASK >> x) != (rv & (GPIO_MASK >> x)))) {
-			std::cout << "Error reading INPUT_REG: " << errno << std::endl;
-			return true;
-		}
+            std::cout << "Error reading INPUT_REG: " << errno << std::endl;
+            return true;
+        }
     }
 
     return false;
