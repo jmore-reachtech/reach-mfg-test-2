@@ -35,6 +35,8 @@ bool Gpio::Test()
 
     auto rv = 0;
     auto x 	= 0;
+    
+    result_.output.clear();
 
     if (verbose_)
         std::cout << "Running I2C" << std::endl; 
@@ -97,7 +99,7 @@ bool Gpio::Test()
         rv = i2c_smbus_read_byte_data(fd_, GPIO_INPUT_REG);
         if(rv < 0) {
             std::cout << "Error setttng OUT_REG: " << errno << std::endl;
-        return true;
+            return true;
         }
         /* check for valid bit */
         if(((GPIO_MASK >> x) != (rv & (GPIO_MASK >> x)))) {

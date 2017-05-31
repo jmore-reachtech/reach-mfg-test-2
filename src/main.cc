@@ -63,7 +63,6 @@ int main(int argc, char** argv)
     auto opt_index      = 0;
     auto opt            = 0;
     auto verbose        = false;
-    auto rv             = false;
     std::string tests;
     std::string image;
     std::string mac;
@@ -211,9 +210,8 @@ int main(int argc, char** argv)
     fs.open("test_log.txt", std::fstream::out | std::fstream::trunc);
     for(auto c : connectors) {
         c->set_verbose(verbose);
-        std::cout << "Testing: " << c->GetName() << " ";
-        rv = c->Test();
-        std::cout << rv << std::endl;
+        c->Test();
+        std::cout << *c << std::endl;
         
         /* save to test log */
         fs << "Connector: " << c->GetName() << std::endl;

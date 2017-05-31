@@ -34,3 +34,16 @@ void Connector::set_verbose(bool verbose)
 {
     verbose_ = verbose;
 }
+
+std::ostream &operator<<(std::ostream &out, const Connector &c)
+{
+    out << "Connector: " << c.name_ << " ";
+    if (c.result_.rv)
+        out << "\033[0;31m" << "\t\tFailed";
+    else
+        out << "\033[0;32m" << "\t\tPassed";
+    
+    out << "\033[0m";
+    
+    return out;
+}
