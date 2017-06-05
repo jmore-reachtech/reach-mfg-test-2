@@ -22,9 +22,10 @@ public:
     void set_verbose(bool verbose);
 
 private:
+    
+protected:
     std::string device_;
     std::string name_;
-protected:
     connector_result result_;
     bool verbose_;
 };
