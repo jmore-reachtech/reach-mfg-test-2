@@ -23,17 +23,27 @@ Uart::Uart(std::string connector, std::string device): Connector(connector, devi
 Uart::~Uart()
 {
     if (verbose_)
-        std::cout << "Destroying UART port" << std::endl; 
+        std::cout << "Destroying UART port" << std::endl;
+    
+    if (fd_ > 0) {
+        close(fd_);
+    }
 }
 
 bool Uart::Test()
 {
+    struct termios tcs;
+    struct timeval timeout;
+    auto rv = 0;
+    char send[2]{'a', '\0'};
+    char recv[2]{'\0', '\0'};
+    fd_set rfds;
+
+    result_.rv = false;
+    result_.output.clear();
+    
     if (verbose_)
         std::cout << "Running UART Test" << std::endl;
-
-    int fd = 0;
-    struct termios tcs;
-    struct timeval timout;
 
     memset(&tcs, 0, sizeof(tcs));
     tcs.c_iflag = 0;
@@ -43,18 +53,65 @@ bool Uart::Test()
     tcs.c_cc[VMIN] = 1;
     tcs.c_cc[VTIME] = 5;
 
-    fd = open(GetDevice().c_str(), O_RDWR);
-    if (fd < 0) {
-        if (verbose_)
-            std::cout << "Error opening: " << GetDevice()  << errno << std::endl;
-        return true;
-        
+    fd_ = open(device_.c_str(), O_RDWR);
+    if (fd_ < 0) {
+        result_.output.append("Error opening: ");
+        result_.output.append(device_);
+        result_.output.append(" ");
+        result_.output.append(std::to_string(errno));
+        result_.rv = true;
+        goto out;
     }
 
     if (verbose_)
-        std::cout << "Opened " << GetDevice() << std::endl;
+        std::cout << "Opened " << device_ << std::endl;
+    
+    rv = write(fd_, send, 1);
+    if (rv != 1) {
+        result_.output.append("Error writing to serial port: ");
+        result_.output.append(device_);
+        result_.output.append(" ");
+        result_.output.append(std::to_string(errno));
+        result_.rv = true;
+        goto out;
+    }
+    
+    timeout.tv_sec = 2;
+    timeout.tv_usec = 0;
+    
+    FD_ZERO(&rfds);
+    FD_SET(fd_, &rfds);
+    
+    rv = select(fd_+1, &rfds, NULL, NULL, &timeout);
+    if (rv == -1) {
+        result_.output.append("Error: select() failed: ");
+        result_.output.append(device_);
+        result_.rv = true;
+        goto out;
+    }
+    else if (rv) {
+        rv = read(fd_,recv,1);
+        if(rv != 1) {
+            result_.output.append("Error: read() failed: ");
+            result_.output.append(device_);
+            result_.rv = true;
+            goto out;
+		}
+        
+        if(strcmp(send,recv)) {
+            result_.output.append("Error: read() mismtach: ");
+            result_.output.append(device_);
+            result_.rv = true;
+            goto out;
+		}
+	}
+    else {
+        result_.output.append("Error: select() timeout: ");
+        result_.output.append(device_);
+        result_.rv = true;
+        goto out;
+	}
 
-    close(fd);
-
-    return false;
+out:
+    return result_.rv;
 }

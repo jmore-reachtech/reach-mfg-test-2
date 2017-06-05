@@ -15,6 +15,7 @@ public:
     virtual bool Test();
 
 private:
+    int fd_{0};
 };
 
 #endif 
