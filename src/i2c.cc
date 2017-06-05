@@ -42,13 +42,15 @@ bool I2c::Test()
     fd_ = open(GetDevice().c_str(), O_RDWR);
     if (fd_ < 0) {
         std::cout << "Error opening " << GetDevice() << errno << std::endl;
-        return true;
+        result_.rv = true;
+        goto out;
     }
 
     rv = ioctl(fd_, I2C_SLAVE, 0x3E);
     if (rv < 0) {
         std::cout << "Error setttng client address: " << errno << std::endl;
-        return true;
+        result_.rv = true;
+        goto out;
     }
 
     rv = i2c_smbus_read_byte_data(fd_,0x1);
@@ -56,5 +58,8 @@ bool I2c::Test()
     if (verbose_)
         std::cout << "read 0x" << std::hex << rv << std::endl;
 
-    return 0xF0 == rv;
+    result_.rv = (0xF0 == rv);
+
+out:
+    return result_.rv;
 }
