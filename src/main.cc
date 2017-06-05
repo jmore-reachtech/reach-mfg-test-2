@@ -32,6 +32,24 @@ static void showUsage(std::string name)
     std::cout << "      --version                       Display Program version" << std::endl << std::endl;
 }
 
+static void listTests(void)
+{
+    std::cout << std::endl << "Available Manufacturing Tests" << std::endl << std::endl;
+    std::cout << "Touch     (J0)" << std::endl;
+    std::cout << "AUART1    (J2)" << std::endl;
+    std::cout << "AUART2    (J21)" << std::endl;
+    std::cout << "AUART3    (J25)" << std::endl;
+    std::cout << "I2C       (J21)" << std::endl;
+    std::cout << "CAN       (J20)" << std::endl;
+    std::cout << "ETHERNET  (J3)" << std::endl;
+    std::cout << "USB1      (J4)" << std::endl;
+    std::cout << "USB2      (J5)" << std::endl;
+    std::cout << "GPIO      (J22)" << std::endl;
+    std::cout << "FLASH     (J0)" << std::endl;
+    std::cout << "LCD       (J0)" << std::endl;
+    std::cout << "RTC       (J0)" << std::endl << std::endl;
+}
+
 std::vector<std::string> split(std::string s)
 {
     std::vector<std::string> items;
@@ -97,7 +115,7 @@ int main(int argc, char** argv)
             case 1: // --mac-address
                 break;
             case 2: // --list-tests
-                std::cout << "list tests long" << std::endl;
+                listTests();
                 return 0;
             case 3: // --verbose
                 break;
