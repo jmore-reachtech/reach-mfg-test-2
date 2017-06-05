@@ -38,7 +38,5 @@ bool Rtc::Test()
     result_.rv = CmdRunner::Run(cmd,result_.output);
 
     return result_.rv;
-
-    return false;
 }
 
