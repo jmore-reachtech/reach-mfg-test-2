@@ -41,14 +41,18 @@ bool I2c::Test()
 
     fd_ = open(GetDevice().c_str(), O_RDWR);
     if (fd_ < 0) {
-        std::cout << "Error opening " << GetDevice() << errno << std::endl;
+        result_.output.append("Error opening: ");
+        result_.output.append(device_);
+        result_.output.append(" ");
+        result_.output.append(std::to_string(errno));
         result_.rv = true;
         goto out;
     }
 
     rv = ioctl(fd_, I2C_SLAVE, 0x3E);
     if (rv < 0) {
-        std::cout << "Error setttng client address: " << errno << std::endl;
+        result_.output.append("Error setttng client address: ");
+        result_.output.append(device_);
         result_.rv = true;
         goto out;
     }
