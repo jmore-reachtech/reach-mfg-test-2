@@ -28,7 +28,7 @@ static void showUsage(std::string name)
     std::cout << "  -h, --help                          Display this help and exit" << std::endl;
     std::cout << "  -v, --verbose                       Enable verbose output" << std::endl;
     std::cout << "  -t, --tests                         Tests to run" << std::endl;
-    std::cout << "      --list-tests                    Display this help and exit" << std::endl;
+    std::cout << "      --list-tests                    List available tests and exit" << std::endl;
     std::cout << "      --mac-address                   Burn in MAC address" << std::endl;
     std::cout << "      --splash                        Splash image to panel" << std::endl;
     std::cout << "      --version                       Display Program version" << std::endl << std::endl;
