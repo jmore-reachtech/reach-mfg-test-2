@@ -18,6 +18,7 @@
 #include "flash.h"
 #include "rtc.h"
 #include "beeper.h"
+#include "speaker.h"
 
 static void showUsage(std::string name)
 {
@@ -48,7 +49,8 @@ static void listTests(void)
     std::cout << "GPIO      (J22)" << std::endl;
     std::cout << "FLASH     (J0)" << std::endl;
     std::cout << "LCD       (J0)" << std::endl;
-    std::cout << "BEEPER    (J0)" << std::endl;
+    std::cout << "BEEPER    (L52)" << std::endl;
+    std::cout << "SPEAKER   (L52)" << std::endl;
     std::cout << "RTC       (J0)" << std::endl << std::endl;
 }
 
@@ -219,6 +221,10 @@ int main(int argc, char** argv)
             }
             if(t == "BEEPER") {
                 connectors.push_back(new Beeper("L52", "/dev/null"));
+                continue;
+            }
+            if(t == "SPEAKER") {
+                connectors.push_back(new Speaker("L52", "/dev/null"));
                 continue;
             }
 
