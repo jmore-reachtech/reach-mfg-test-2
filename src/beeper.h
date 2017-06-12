@@ -1,11 +1,18 @@
 #ifndef BEEPER_H
 #define BEEPER_H
 
-class beeper
+#include <string>
+
+#include "connector.h"
+
+class Beeper: public Connector
 {
 public:
-    beeper();
-    ~beeper();
+    Beeper();
+    Beeper(std::string connector, std::string device);
+    virtual ~Beeper();
+
+    virtual bool Test();
 
 };
 

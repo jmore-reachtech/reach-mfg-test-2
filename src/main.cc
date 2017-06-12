@@ -17,6 +17,7 @@
 #include "touch.h"
 #include "flash.h"
 #include "rtc.h"
+#include "beeper.h"
 
 static void showUsage(std::string name)
 {
@@ -47,6 +48,7 @@ static void listTests(void)
     std::cout << "GPIO      (J22)" << std::endl;
     std::cout << "FLASH     (J0)" << std::endl;
     std::cout << "LCD       (J0)" << std::endl;
+    std::cout << "BEEPER    (J0)" << std::endl;
     std::cout << "RTC       (J0)" << std::endl << std::endl;
 }
 
@@ -87,11 +89,13 @@ int main(int argc, char** argv)
     std::vector<Connector*> connectors;
     std::vector<std::string> connector_tests;
     std::fstream fs;
-    
+
+
+
     /* pull server vars from env */
     auto server_addr    = "";
     auto rtc_addr       = "";
-    
+
     if(const char* env_p = std::getenv("TEST_WEB_SERVER_ADDR")) {
         server_addr = env_p;
     }
@@ -105,7 +109,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    
+
     while((opt = getopt_long(argc, argv, short_opts, long_opts, &opt_index)) != -1) {
         switch(opt) {
         case 0:
@@ -129,7 +133,7 @@ int main(int argc, char** argv)
                 std::cout << image << std::endl;
                 return 0;
             case 6: // --version
-                std::cout << "Version 1.1.1" << std::endl;
+                std::cout << "Version 1.0.2" << std::endl;
                 return 0;
             default:
                 return 1;
@@ -213,6 +217,10 @@ int main(int argc, char** argv)
                 connectors.push_back(new Rtc("J3", "eth0", rtc_addr));
                 continue;
             }
+            if(t == "BEEPER") {
+                connectors.push_back(new Beeper("L52", "/dev/null"));
+                continue;
+            }
 
             /* Invalid test */
             std::cout << "Invalid test: " << t << std::endl;
@@ -230,7 +238,7 @@ int main(int argc, char** argv)
         c->set_verbose(verbose);
         c->Test();
         std::cout << *c << std::endl;
-        
+
         /* save to test log */
         fs << "Connector: " << c->GetName() << std::endl;
         fs << "Status: " << c->get_connector_result().rv << std::endl;
@@ -242,7 +250,7 @@ int main(int argc, char** argv)
     for(auto c : connectors) {
         delete c;
     }
-    
+
     /* close test log */
     fs.close();
 
