@@ -27,14 +27,21 @@ bool Rtc::Test()
      
     if (verbose_)
         std::cout << "Running RTC Test" << std::endl;
-        
-    cmd.append("rdate ");
+
+    result_.output.clear();        
+    cmd.append("rdate -p -s ");
     cmd.append(server_addr_);
     
     if (verbose_)
         std::cout << "Running RTC Test - server: " << server_addr_ << std::endl;
 
-    result_.output.clear();
+    result_.rv = CmdRunner::Run(cmd,result_.output);
+    if (result_.rv) {
+        return result_.rv;
+    }
+    
+    cmd.clear();
+    cmd.append("hwclock -w");
     result_.rv = CmdRunner::Run(cmd,result_.output);
 
     return result_.rv;
