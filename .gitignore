@@ -9,3 +9,5 @@ Makefile.local
 tags
 reach-mfg-test-2.project
 .codelite/
+.atom-build.yml
+.vscode
