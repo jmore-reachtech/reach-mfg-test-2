@@ -7,6 +7,7 @@
 #include <string.h>
 #include <cstdlib>
 
+#include "board.h"
 #include "uart.h"
 #include "i2c.h"
 #include "can.h"
@@ -71,7 +72,7 @@ std::vector<std::string> split(std::string s)
 static const char* short_opts = "vht:";
 static const struct option long_opts[] = {
     { "tests",          required_argument, 0, 't' },
-    { "mac-address",    required_argument, 0, 'm' },
+    { "mac-address",    required_argument, 0, 0 },
     { "list-tests",     no_argument,       0, 0 },
     { "verbose",        no_argument,       0, 'v' },
     { "help",           no_argument,       0, 'h' },
@@ -88,11 +89,10 @@ int main(int argc, char** argv)
     std::string tests;
     std::string image;
     std::string mac;
+    //TODO: move this to board class
     std::vector<Connector*> connectors;
     std::vector<std::string> connector_tests;
     std::fstream fs;
-
-
 
     /* pull server vars from env */
     auto server_addr    = "";
@@ -111,7 +111,6 @@ int main(int argc, char** argv)
         return 1;
     }
 
-
     while((opt = getopt_long(argc, argv, short_opts, long_opts, &opt_index)) != -1) {
         switch(opt) {
         case 0:
@@ -119,6 +118,9 @@ int main(int argc, char** argv)
             case 0: // --tests
                 break;
             case 1: // --mac-address
+                if(optarg) {
+                    mac = strdup(optarg);
+                }
                 break;
             case 2: // --list-tests
                 listTests();
@@ -146,11 +148,6 @@ int main(int argc, char** argv)
                 tests = strdup(optarg);
             }
             break;
-        case 'm': // --mac-address
-            if(optarg) {
-                mac = strdup(optarg);
-            }
-            return 0;
         case 'v': // --verbose
             verbose = true;
             break;
@@ -239,22 +236,36 @@ int main(int argc, char** argv)
         }
     }
 
-    fs.open("test_log.txt", std::fstream::out | std::fstream::trunc);
-    for(auto c : connectors) {
-        c->set_verbose(verbose);
-        c->Test();
-        std::cout << *c << std::endl;
+    if (connectors.size() > 0) {
+        fs.open("test_log.txt", std::fstream::out | std::fstream::trunc);
+        for(auto c : connectors) {
+            c->set_verbose(verbose);
+            c->Test();
+            std::cout << *c << std::endl;
 
-        /* save to test log */
-        fs << "Connector: " << c->GetName() << std::endl;
-        fs << "Status: " << c->get_connector_result().rv << std::endl;
-        fs << "**********************" << std::endl;
-        fs << "Output: " << c->get_connector_result().output << std::endl << std::endl;
+            /* save to test log */
+            fs << "Connector: " << c->GetName() << std::endl;
+            fs << "Status: " << c->get_connector_result().rv << std::endl;
+            fs << "**********************" << std::endl;
+            fs << "Output: " << c->get_connector_result().output << std::endl << std::endl;
+        }
+        std::cout << std::endl << "Test Complete" << std::endl;
+
+        for(auto c : connectors) {
+            delete c;
+        }
     }
-    std::cout << std::endl << "Test Complete" << std::endl;
 
-    for(auto c : connectors) {
-        delete c;
+    /* assign mac if set */
+    if (mac.length() > 0) {
+        Board b;
+        auto rv = b.AssignMac(mac);
+        
+        if (rv) {
+            std::cout << "Mac Address " << mac << " Write Failed!" << std::endl;
+        } else {
+            std::cout << "Mac Address " << mac << " Write Success!" << std::endl;
+        }
     }
 
     /* close test log */
