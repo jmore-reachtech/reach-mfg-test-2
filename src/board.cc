@@ -28,7 +28,6 @@ Board::~Board()
 bool Board::AssignMac(const std::string addr)
 {
     std::vector<char>   buf;
-    
     uint32_t mac_0_n    = ~0x0;
     uint32_t mac_1_n    = ~0x0;
     auto mac_0_rv       = true;
@@ -41,7 +40,6 @@ bool Board::AssignMac(const std::string addr)
             continue;
         buf.push_back(c);
     }
-    
 
     if (buf.size() != 12) {
         std::cout << "Invalid MAC length!" << std::endl;
@@ -110,8 +108,8 @@ bool Board::testAndSetMac(uint32_t mac_new, FILE* fp)
     fflush(fp);
     if (rv < 0)
     {
-        return true;
         std::cout << "Error writng MAC: " << mac_new << " " << strerror(errno) << std::endl;
+        return true;
     }
     
     return false;
