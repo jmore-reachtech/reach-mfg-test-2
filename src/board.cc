@@ -81,6 +81,7 @@ bool Board::AssignMac(const std::string addr)
     
     return mac_0_rv || mac_1_rv;
 }
+
 bool Board::testAndSetMac(uint32_t mac_new, FILE* fp)
 {
     uint32_t mac_cur    = ~0x0;
