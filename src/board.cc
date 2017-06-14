@@ -99,7 +99,7 @@ bool Board::testAndSetMac(uint32_t mac_new, FILE* fp)
     
     /* Mac set but does not match */
     if (mac_cur != 0x0) {
-        std::cout << "Mac set but mismatch! New: 0x" << mac_new << ", Cur: 0x" << mac_cur << std::endl;
+        std::cout << "Mac set but mismatch! New: 0x" << std::hex << mac_new << ", Cur: 0x" << mac_cur << std::endl;
         return true;
     }
     
