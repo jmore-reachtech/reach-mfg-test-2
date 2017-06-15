@@ -29,7 +29,7 @@ bool Rtc::Test()
         std::cout << "Running RTC Test" << std::endl;
 
     result_.output.clear();        
-    cmd.append("rdate -p -s ");
+    cmd.append("rdate -s ");
     cmd.append(server_addr_);
     
     if (verbose_)
