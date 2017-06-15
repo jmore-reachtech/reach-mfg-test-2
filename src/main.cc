@@ -254,6 +254,9 @@ int main(int argc, char** argv)
         for(auto c : connectors) {
             delete c;
         }
+
+        /* close test log */
+        fs.close();
     }
 
     /* assign mac if set */
@@ -267,9 +270,6 @@ int main(int argc, char** argv)
             std::cout << "Mac Address " << mac << " Write Success!" << std::endl;
         }
     }
-
-    /* close test log */
-    fs.close();
 
     return 0;
 }
