@@ -38,10 +38,10 @@ static void showUsage(std::string name)
 static void listTests(void)
 {
     std::cout << std::endl << "Available Manufacturing Tests" << std::endl << std::endl;
-    std::cout << "Touch     (J0)" << std::endl;
+    std::cout << "TOUCH     (J0)" << std::endl;
     std::cout << "AUART1    (J2)" << std::endl;
-    std::cout << "AUART2    (J21)" << std::endl;
     std::cout << "AUART3    (J25)" << std::endl;
+    std::cout << "AUART4    (J21)" << std::endl;
     std::cout << "I2C       (J21)" << std::endl;
     std::cout << "CAN       (J20)" << std::endl;
     std::cout << "ETHERNET  (J3)" << std::endl;
@@ -172,12 +172,12 @@ int main(int argc, char** argv)
                 connectors.push_back(new Uart("J2", "/dev/ttymxc1"));
                 continue;
             }
-            if(t == "AUART2") {
-                connectors.push_back(new Uart("J21", "/dev/ttymxc3"));
+            if(t == "AUART3") {
+                connectors.push_back(new Uart("J25", "/dev/ttymxc3"));
                 continue;
             }
-            if(t == "AUART3") {
-                connectors.push_back(new Uart("J25", "/dev/ttymxc4"));
+            if(t == "AUART4") {
+                connectors.push_back(new Uart("J21", "/dev/ttymxc4"));
                 continue;
             }
             if(t == "I2C") {

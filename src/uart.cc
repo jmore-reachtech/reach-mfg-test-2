@@ -62,6 +62,9 @@ bool Uart::Test()
         result_.rv = true;
         goto out;
     }
+    cfsetospeed(&tcs, B115200);
+    cfsetispeed(&tcs, B115200);
+    tcsetattr(fd_, TCSANOW, &tcs);
 
     if (verbose_)
         std::cout << "Opened " << device_ << std::endl;
@@ -76,7 +79,7 @@ bool Uart::Test()
         goto out;
     }
     
-    timeout.tv_sec = 2;
+    timeout.tv_sec = 1;
     timeout.tv_usec = 0;
     
     FD_ZERO(&rfds);

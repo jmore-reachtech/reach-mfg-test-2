@@ -49,7 +49,7 @@ bool I2c::Test()
         goto out;
     }
 
-    rv = ioctl(fd_, I2C_SLAVE, 0x3E);
+    rv = ioctl(fd_, I2C_SLAVE, I2C_SLAVE_ADDR);
     if (rv < 0) {
         result_.output.append("Error setttng client address: ");
         result_.output.append(device_);
@@ -57,12 +57,20 @@ bool I2c::Test()
         goto out;
     }
 
-    rv = i2c_smbus_read_byte_data(fd_,0x1);
-
+    rv = i2c_smbus_read_byte_data(fd_,I2C_CTRL_ADDR);
     if (verbose_)
         std::cout << "read 0x" << std::hex << rv << std::endl;
+    if (rv < 1) {
+        result_.output.append("Error reading client data: ");
+        result_.output.append(device_);
+        result_.output.append(", 0x05");
+        result_.output.append(", errno ");
+        result_.output.append(std::to_string(errno));
+        result_.rv = true;
+        goto out;
+    }
 
-    result_.rv = (0xF0 == rv);
+    result_.rv = !(0xBC == rv);
 
 out:
     return result_.rv;

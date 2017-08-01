@@ -1,6 +1,9 @@
 #ifndef I2C_H
 #define I2C_H
 
+#define I2C_SLAVE_ADDR  0x05
+#define I2C_CTRL_ADDR   0x0C
+
 #include "connector.h"
 
 class I2c: public Connector
