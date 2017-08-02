@@ -3,6 +3,7 @@
 
 #define I2C_SLAVE_ADDR  0x05
 #define I2C_CTRL_ADDR   0x0C
+#define I2C_CTRL_DATA   0x03
 
 #include "connector.h"
 

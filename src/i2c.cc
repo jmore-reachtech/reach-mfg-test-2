@@ -33,7 +33,7 @@ bool I2c::Test()
 {
     auto rv = 0;
     
-    result_.rv = false;
+    result_.rv = true;
     result_.output.clear();
 
     if (verbose_)
@@ -63,14 +63,23 @@ bool I2c::Test()
     if (rv < 1) {
         result_.output.append("Error reading client data: ");
         result_.output.append(device_);
-        result_.output.append(", 0x05");
+        result_.output.append(", ");
+        result_.output.append(std::to_string(I2C_CTRL_ADDR));
         result_.output.append(", errno ");
         result_.output.append(std::to_string(errno));
         result_.rv = true;
         goto out;
     }
 
-    result_.rv = !(0xBC == rv);
+    if (rv != I2C_CTRL_DATA) {
+        result_.output.append("Slave address mismatch. expected ");
+        result_.output.append(std::to_string(I2C_CTRL_DATA));
+        result_.output.append(", got ");
+        result_.output.append(std::to_string(rv));
+        result_.rv = true;
+    } else {
+        result_.rv = false;
+    }
 
 out:
     return result_.rv;
