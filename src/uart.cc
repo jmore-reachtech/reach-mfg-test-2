@@ -104,6 +104,10 @@ bool Uart::Test()
         if(strcmp(send,recv)) {
             result_.output.append("Error: read() mismtach: ");
             result_.output.append(device_);
+            result_.output.append(" Expected ");
+            result_.output.append(std::to_string(send[0]));
+            result_.output.append(", Got ");
+            result_.output.append(std::to_string(recv[0]));
             result_.rv = true;
             goto out;
 		}
