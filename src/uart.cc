@@ -101,6 +101,8 @@ bool Uart::Test()
             goto out;
 		}
         
+        /* we send lowercase 'a' 0x61 and should get back an uppercase 'A' 0x41 */
+        send[0] -= 0x20;
         if(strcmp(send,recv)) {
             result_.output.append("Error: read() mismtach: ");
             result_.output.append(device_);
