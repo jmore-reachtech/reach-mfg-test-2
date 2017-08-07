@@ -1,21 +1,31 @@
 SRCDIR 		:= src
 BUILDDIR 	:= build
+LIBDIR	 	:= lib
 TARGET 		:= bin/mfg-test
   
 SRCEXT 		:= cc
 SOURCES 	:= $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS 	:= $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
-CFLAGS 		:= -g -Wall -std=c++11
+CFLAGS 		:= -g -Wall
+CXXFLAGS	:= -g -Wall -std=c++11
 LIB 		:= -pthread -L lib
 INC 		:= -I include
 
-$(TARGET): $(OBJECTS)
+CANSRCEXT	:= c
+CANSRCS		:= $(shell find $(LIBDIR) -type f -name *.$(CANSRCEXT))
+CANOBJS		:= $(patsubst $(LIBDIR)/%,$(BUILDDIR)/%,$(CANSRCS:.$(CANSRCEXT)=.o))
+
+$(TARGET): $(OBJECTS) $(CANOBJS)
 	@echo " Linking..."
 	@echo " $(CXX) $^ -o $(TARGET) $(LIB)"; $(CXX) $^ -o $(TARGET) $(LIB)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)
-	@echo " $(CXX) $(CFLAGS) $(INC) -c -o $@ $<"; $(CXX) $(CFLAGS) $(INC) -c -o $@ $<
+	@echo " $(CXX) $(CXXFLAGS) $(INC) -c -o $@ $<"; $(CXX) $(CXXFLAGS) $(INC) -c -o $@ $<
+
+$(BUILDDIR)/%.o: $(LIBDIR)/%.$(CANSRCEXT)
+	@mkdir -p $(BUILDDIR)
+	@echo " $(CC) $(CFLAGS) $(INC) -c -o $@ $<"; $(CC) $(CFLAGS) $(INC) -c -o $@ $<
 
 clean:
 	@echo " Cleaning..."; 
