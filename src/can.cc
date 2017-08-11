@@ -1,4 +1,6 @@
 #include <iostream>
+#include <sstream>
+#include <iomanip>
 #include <string.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
@@ -42,11 +44,20 @@ bool Can::Test()
 {
     struct sockaddr_can sock_addr;
     struct ifreq ifr;
-    struct can_frame frame;
+    struct can_frame txframe;
+    struct can_frame rxframe;
     std::string cmd;
-    char msg[] = {'a'};
+    char msg[2] = {0xDE, 0xAD};
+    struct timeval timeout;
+    fd_set rfds;
+    auto rv = 0;
+    std::stringstream ss;
+    int msg_rec = 0;
     
-    /* */
+    result_.rv = false;
+    result_.output.clear();
+    
+    /* load the can kernel module */
     cmd = "modprobe flexcan";
     if ((CmdRunner::Run(cmd,result_.output))) {
         std::cout << "Failed to load flexcan module" << std::endl;
@@ -107,15 +118,69 @@ bool Can::Test()
         std::cout << "Running CAN Test" << std::endl;
     
     /* send the message */
-    memset(&frame, 0, sizeof(frame));
-    frame.can_id = 0x0;
-    strncpy(reinterpret_cast<char *>(frame.data), msg, sizeof(msg));
-    if (write(fd_,&frame,sizeof(frame)) < 0) {
+    memset(&txframe, 0, sizeof(txframe));
+    txframe.can_id = 0x3E;
+    txframe.can_dlc = 2;
+    strncpy(reinterpret_cast<char *>(txframe.data), msg, sizeof(msg));
+    rv = write(fd_, &txframe, sizeof(txframe));
+    if (rv < 0) {
         std::cout << "Failed to write to the CAN bus" << std::endl;
         result_.rv = true;
         goto out;
     }
     
+    timeout.tv_sec = 1;
+    timeout.tv_usec = 0;
+    
+    FD_ZERO(&rfds);
+    FD_SET(fd_, &rfds);
+
+    memset(&rxframe, 0, sizeof(rxframe));
+    rxframe.can_dlc = 2;
+    rv = select(fd_+1, &rfds, NULL, NULL, &timeout);
+    if (rv == -1) {
+        result_.output.append("Error: select() failed: ");
+        result_.output.append(device_);
+        result_.rv = true;
+        goto out;
+    }
+    else if (rv) {
+        rv = read(fd_, &rxframe, sizeof(rxframe));
+        if(rv == -1) {
+            result_.output.append("Error: read() failed: ");
+            result_.output.append(device_);
+            result_.output.append(" ");
+            result_.output.append(std::to_string(errno));
+            result_.rv = true;
+            goto out;
+		}
+        
+        msg_rec |= (rxframe.data[0] << 8);
+        msg_rec |= (rxframe.data[1] << 0);
+        
+        if (verbose_)
+            std::cout << "0x" << std::uppercase << std::hex << msg_rec << std::endl;
+        
+        /* tesst for match */
+        if (msg_rec == CAN_MSG_EXPECTED) {
+            result_.rv = false;
+        } else {
+            result_.output.append("Frame mismatch: ");
+            /* TODO: fix me, hard coded for now */
+            result_.output.append("expected 0xBEEF");
+            result_.output.append(", got 0x");
+            ss << std::hex;
+            ss << std::uppercase << std::setw(4) << std::setfill('0') << msg_rec;
+            result_.output.append(ss.str());
+            result_.rv = true;
+        }
+	}
+    else {
+        result_.output.append("Error: select() timeout: ");
+        result_.output.append(device_);
+        result_.rv = true;
+        goto out;
+	}
 
 out:
     return result_.rv;

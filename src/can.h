@@ -6,7 +6,8 @@
 #include "connector.h"
 
 #define CAN_IF "can0"
-#define CAN_BAUD_RATE 1000000
+#define CAN_BAUD_RATE 500000
+#define CAN_MSG_EXPECTED 0xBEEF
 
 class Can: public Connector {
 
