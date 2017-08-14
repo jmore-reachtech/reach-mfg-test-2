@@ -5,7 +5,11 @@
 
 #include "connector.h"
 
-class Uart: public Connector {
+#define TIOCGRS485 0x542E
+#define TIOCSRS485 0x542F
+
+class Uart : public Connector
+{
 
 public:
     Uart();
@@ -13,9 +17,11 @@ public:
     virtual ~Uart();
 
     virtual bool Test();
+    void EnableRs485();
 
 private:
-    int fd_{0};
+    int fd_{ 0 };
+    bool rs485_;
 };
 
-#endif 
+#endif

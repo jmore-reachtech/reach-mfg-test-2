@@ -5,6 +5,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <linux/serial.h>
+#include <sys/ioctl.h>
 
 #include "uart.h"
 
@@ -14,7 +16,7 @@ Uart::Uart(): Connector("Unknown", "/dev/null")
         std::cout << "Creating UART port" << std::endl; 
 }
 
-Uart::Uart(std::string connector, std::string device): Connector(connector, device)
+Uart::Uart(std::string connector, std::string device): Connector(connector, device), rs485_(false)
 {
     if (verbose_)
         std::cout << "Creating UART conector " << connector << " using device" << device << std::endl; 
@@ -30,6 +32,13 @@ Uart::~Uart()
     }
 }
 
+void Uart::EnableRs485()
+{
+    if (verbose_)
+        std::cout << "Enabling half duplex" << std::endl;
+    rs485_ = true;
+}
+
 bool Uart::Test()
 {
     struct termios tcs;
@@ -38,6 +47,7 @@ bool Uart::Test()
     char send[2]{'a', '\0'};
     char recv[2]{'\0', '\0'};
     fd_set rfds;
+    struct serial_rs485 rs485conf;
 
     result_.rv = false;
     result_.output.clear();
@@ -65,6 +75,27 @@ bool Uart::Test()
     cfsetospeed(&tcs, B115200);
     cfsetispeed(&tcs, B115200);
     tcsetattr(fd_, TCSANOW, &tcs);
+
+    if (rs485_) {
+        if (ioctl(fd_, TIOCGRS485, &rs485conf) < 0) {
+            std::cout << "TIOCGRS485 ioctl failed " << device_ << std::endl;
+        }
+
+        /* enable RS485 mode: */
+        rs485conf.flags |= SER_RS485_ENABLED;
+        /* set logical level for RTS pin equal to 1 when sending: */
+        rs485conf.flags |= SER_RS485_RTS_ON_SEND;
+        /* set logical level for RTS pin equal to 0 after sending: */
+        rs485conf.flags &= ~(SER_RS485_RTS_AFTER_SEND);
+        /* set rts delay before send, if needed: */
+        rs485conf.delay_rts_before_send = 1;
+        /* set rts delay after send, if needed: */
+        rs485conf.delay_rts_after_send = 1;
+
+        if (ioctl(fd_, TIOCSRS485, &rs485conf) < 0) {
+            std::cout << "TIOCSRS485 ioctl failed " << device_ << std::endl;
+        }
+    }
 
     if (verbose_)
         std::cout << "Opened " << device_ << std::endl;

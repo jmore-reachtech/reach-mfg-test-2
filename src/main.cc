@@ -30,6 +30,7 @@ static void showUsage(std::string name)
     std::cout << "  -v, --verbose                       Enable verbose output" << std::endl;
     std::cout << "  -t, --tests                         Tests to run" << std::endl;
     std::cout << "      --list-tests                    List available tests and exit" << std::endl;
+    std::cout << "      --half-duplex                   Set AUART3 (J25) to half duplex" << std::endl;
     std::cout << "      --mac-address                   Burn in MAC address" << std::endl;
     std::cout << "      --splash                        Splash image to panel" << std::endl;
     std::cout << "      --version                       Display Program version" << std::endl << std::endl;
@@ -74,6 +75,7 @@ static const struct option long_opts[] = {
     { "tests",          required_argument, 0, 't' },
     { "mac-address",    required_argument, 0, 0 },
     { "list-tests",     no_argument,       0, 0 },
+    { "half-duplex",    no_argument,       0, 0 },
     { "verbose",        no_argument,       0, 'v' },
     { "help",           no_argument,       0, 'h' },
     { "splash",         optional_argument, 0, 0 },
@@ -86,6 +88,7 @@ int main(int argc, char** argv)
     auto opt_index      = 0;
     auto opt            = 0;
     auto verbose        = false;
+    auto half_duplex    = false;
     std::string tests;
     std::string image;
     std::string mac;
@@ -125,18 +128,21 @@ int main(int argc, char** argv)
             case 2: // --list-tests
                 listTests();
                 return 0;
-            case 3: // --verbose
+            case 3: // --half-duplex
+                half_duplex = true;
                 break;
-            case 4: // --help
+            case 4: // --verbose
                 break;
-            case 5: // --splash
+            case 5: // --help
+                break;
+            case 6: // --splash
                 std::cout << "Splash long";
                 if(optarg) {
                     image = strdup(optarg);
                 }
                 std::cout << image << std::endl;
                 return 0;
-            case 6: // --version
+            case 7: // --version
                 std::cout << "Version 1.0.2" << std::endl;
                 return 0;
             default:
@@ -173,7 +179,11 @@ int main(int argc, char** argv)
                 continue;
             }
             if(t == "AUART3") {
-                connectors.push_back(new Uart("J25", "/dev/ttymxc3"));
+                Uart *u = new Uart("J25", "/dev/ttymxc3");
+                if (half_duplex) {
+                    u->EnableRs485();
+                }
+                connectors.push_back(u);
                 continue;
             }
             if(t == "AUART4") {
