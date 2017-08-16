@@ -17,11 +17,11 @@ public:
     virtual ~Uart();
 
     virtual bool Test();
-    void EnableRs485();
+    void EnableHalfDuplex();
 
 private:
     int fd_{ 0 };
-    bool rs485_;
+    bool half_duplex_;
 };
 
 #endif

@@ -181,7 +181,7 @@ int main(int argc, char** argv)
             if(t == "AUART3") {
                 Uart *u = new Uart("J25", "/dev/ttymxc3");
                 if (half_duplex) {
-                    u->EnableRs485();
+                    u->EnableHalfDuplex();
                 }
                 connectors.push_back(u);
                 continue;
