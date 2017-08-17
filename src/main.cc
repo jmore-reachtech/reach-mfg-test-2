@@ -34,6 +34,11 @@ static void showUsage(std::string name)
     std::cout << "      --mac-address                   Burn in MAC address" << std::endl;
     std::cout << "      --splash                        Splash image to panel" << std::endl;
     std::cout << "      --version                       Display Program version" << std::endl << std::endl;
+    std::cout << "Environment:" << std::endl;
+    std::cout << "  TEST_WEB_SERVER_ADDR                Web server address to test ETHERNET" << std::endl;
+    std::cout << "                                          Defaults to: 10.10.10.2" << std::endl;
+    std::cout << "  TEST_RTC_SERVER_ADDR                Time server address to test RTC" << std::endl;
+    std::cout << "                                          Defaults to: 10.10.10.2" << std::endl << std::endl;
 }
 
 static void listTests(void)
