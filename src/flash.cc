@@ -34,24 +34,45 @@ bool Flash::Test()
 
     result_.output.clear();
     
+    if (verbose_) {
+        std::cout << "Testing /dev/mtd0" << std::endl;
+    }
     cmd = "/usr/sbin/nandtest -m -o 0x0 /dev/mtd0";
     if (CmdRunner::Run(cmd,result_.output))
         return true;
+    if (verbose_) {
+        std::cout << "Testing /dev/mtd1" << std::endl;
+    }
     cmd = "/usr/sbin/nandtest -m -o 0x0 /dev/mtd1";
     if (CmdRunner::Run(cmd,result_.output))
         return true;
+    if (verbose_) {
+        std::cout << "Testing /dev/mtd2" << std::endl;
+    }
     cmd = "/usr/sbin/nandtest -m -o 0x0 /dev/mtd2";
     if (CmdRunner::Run(cmd,result_.output))
         return true;
+    if (verbose_) {
+        std::cout << "Testing /dev/mtd3" << std::endl;
+    }
     cmd = "/usr/sbin/nandtest -m -o 0x0 /dev/mtd3";
     if (CmdRunner::Run(cmd,result_.output))
         return true;
+    if (verbose_) {
+        std::cout << "Testing /dev/mtd4" << std::endl;
+    }
     cmd = "/usr/sbin/nandtest -m -o 0x0 /dev/mtd4";
     if (CmdRunner::Run(cmd,result_.output))
         return true;
+    if (verbose_) {
+        std::cout << "Testing /dev/mtd5" << std::endl;
+    }
     cmd = "/usr/sbin/nandtest -m -o 0x0 /dev/mtd5";
     if (CmdRunner::Run(cmd,result_.output))
         return true;
+    if (verbose_) {
+        std::cout << "Testing /dev/mtd6" << std::endl;
+    }
     cmd = "/usr/sbin/nandtest -m -o 0x0 /dev/mtd6";
     if (CmdRunner::Run(cmd,result_.output))
         return true;
