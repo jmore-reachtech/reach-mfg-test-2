@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <fstream>
 #include <iomanip>
 #include <stdio.h>
 #include <unistd.h>
@@ -9,8 +10,9 @@
 #include <string.h>
 
 #include "board.h"
+#include "cmdrunner.h"
 
-Board::Board()
+Board::Board(): verbose_(false), ip_addr_("")
 {
 }
 
@@ -23,6 +25,67 @@ Board::~Board()
     if (fp_mac_1_ != nullptr) {
         fclose(fp_mac_1_);
     }
+}
+
+bool Board::AddConnector(Connector *c)
+{
+    connectors_.push_back(c);
+
+    return false;
+}
+
+void Board::SetVerbose(bool v)
+{
+    verbose_ = v;
+}
+
+void Board::SetIpAddr(std::string ip)
+{
+    ip_addr_ = ip;
+}
+
+bool Board::Test(void)
+{
+    std::fstream fs;
+
+    if (connectors_.size() > 0) {
+        /* bring up the eth interface */
+        this->ifUpDown(IF_UP);
+        fs.open("test_log.txt", std::fstream::out | std::fstream::trunc);
+        for(auto c : connectors_) {
+            c->set_verbose(verbose_);
+            c->Test();
+            std::cout << *c << std::endl;
+
+            /* save to test log */
+            fs << "Connector: " << c->GetName() << std::endl;
+            fs << "Status: " << c->get_connector_result().rv << std::endl;
+            fs << "**********************" << std::endl;
+            fs << "Output: " << c->get_connector_result().output << std::endl << std::endl;
+        }
+        std::cout << std::endl << "Test Complete" << std::endl;
+
+        for(auto c : connectors_) {
+            delete c;
+        }
+
+        /* close test log */
+        fs.close();
+
+        /* bring down the eth interface */
+        this->ifUpDown(IF_DOWN);
+    }
+
+    return false;
+}
+
+bool Board::Reset(void)
+{
+    for(auto c :  connectors_) {
+        delete c;
+    }
+
+    return false;
 }
 
 bool Board::AssignMac(const std::string addr)
@@ -112,5 +175,29 @@ bool Board::testAndSetMac(uint32_t mac_new, FILE* fp)
         return true;
     }
     
+    return false;
+}
+
+bool Board::ifUpDown(bool up)
+{
+    std::string cmd;
+    std::string out;
+
+    cmd.append("ifconfig ");
+    cmd.append(DEFAULT_ETH_INTERFACE);
+    if (up) {
+        cmd.append(" netmask 255.255.255.0 ");
+        if (ip_addr_.length() == 0) {
+            cmd.append(DEFAULT_LOCAL_ADDR);
+        } else {
+            cmd.append(ip_addr_);
+        }
+        cmd.append(" up");
+        CmdRunner::Run(cmd, out);
+    } else {
+        cmd.append(" down");
+        CmdRunner::Run(cmd, out);
+    }
+
     return false;
 }

@@ -2,7 +2,6 @@
 #include <sstream>
 #include <vector>
 #include <string>
-#include <fstream>
 #include <getopt.h>
 #include <string.h>
 #include <cstdlib>
@@ -38,7 +37,9 @@ static void showUsage(std::string name)
     std::cout << "  TEST_WEB_SERVER_ADDR                Web server address to test ETHERNET" << std::endl;
     std::cout << "                                          Defaults to: 10.10.10.2" << std::endl;
     std::cout << "  TEST_RTC_SERVER_ADDR                Time server address to test RTC" << std::endl;
-    std::cout << "                                          Defaults to: 10.10.10.2" << std::endl << std::endl;
+    std::cout << "                                          Defaults to: 10.10.10.2" << std::endl;
+    std::cout << "  TEST_MODULE_ADDR                    Module local IP address" << std::endl;
+    std::cout << "                                          Defaults to: 10.10.10.3" << std::endl << std::endl;
 }
 
 static void listTests(void)
@@ -92,15 +93,12 @@ int main(int argc, char** argv)
 {
     auto opt_index      = 0;
     auto opt            = 0;
-    auto verbose        = false;
     auto half_duplex    = false;
     std::string tests;
     std::string image;
     std::string mac;
-    //TODO: move this to board class
-    std::vector<Connector*> connectors;
+    Board b;
     std::vector<std::string> connector_tests;
-    std::fstream fs;
 
     /* pull server vars from env */
     auto server_addr    = "";
@@ -111,6 +109,9 @@ int main(int argc, char** argv)
     }
     if(const char* env_p = std::getenv("TEST_RTC_SERVER_ADDR")) {
         rtc_addr = env_p;
+    }
+    if(const char* env_p = std::getenv("TEST_MODULE_ADDR")) {
+        b.SetIpAddr(env_p);
     }
 
     if(argc == 1) {
@@ -160,7 +161,7 @@ int main(int argc, char** argv)
             }
             break;
         case 'v': // --verbose
-            verbose = true;
+            b.SetVerbose(true);
             break;
         case 'h': // --help
             showUsage(argv[0]);
@@ -176,11 +177,11 @@ int main(int argc, char** argv)
         connector_tests = split(tests);
         for(auto t : connector_tests) {
             if(t == "TOUCH") {
-                connectors.push_back(new Touch("J0", "/dev/input/touchscreen0"));
+                b.AddConnector(new Touch("J0", "/dev/input/touchscreen0"));
                 continue;
             }
             if(t == "AUART1") {
-                connectors.push_back(new Uart("J2", "/dev/ttymxc1"));
+                b.AddConnector(new Uart("J2", "/dev/ttymxc1"));
                 continue;
             }
             if(t == "AUART3") {
@@ -188,91 +189,68 @@ int main(int argc, char** argv)
                 if (half_duplex) {
                     u->EnableHalfDuplex();
                 }
-                connectors.push_back(u);
+                b.AddConnector(u);
                 continue;
             }
             if(t == "AUART4") {
-                connectors.push_back(new Uart("J21", "/dev/ttymxc4"));
+                b.AddConnector(new Uart("J21", "/dev/ttymxc4"));
                 continue;
             }
             if(t == "I2C") {
-                connectors.push_back(new I2c("J21", "/dev/i2c-1"));
+                b.AddConnector(new I2c("J21", "/dev/i2c-1"));
                 continue;
             }
             if(t == "CAN") {
-                connectors.push_back(new Can("J20", "can0"));
+                b.AddConnector(new Can("J20", "can0"));
                 continue;
             }
             if(t == "ETHERNET") {
-                connectors.push_back(new Ethernet("J3", "eth0", server_addr));
+                b.AddConnector(new Ethernet("J3", "eth0", server_addr));
                 continue;
             }
             if(t == "USB1") {
-                connectors.push_back(new Usb("J4", "/dev/sda1"));
+                b.AddConnector(new Usb("J4", "/dev/sda1"));
                 continue;
             }
             if(t == "USB2") {
-                connectors.push_back(new Usb("J5", "/dev/sdb1"));
+                b.AddConnector(new Usb("J5", "/dev/sdb1"));
                 continue;
             }
             if(t == "GPIO") {
-                connectors.push_back(new Gpio("J22", "/dev/i2c-0"));
+                b.AddConnector(new Gpio("J22", "/dev/i2c-0"));
                 continue;
             }
             if(t == "FLASH") {
-                connectors.push_back(new Flash("J0", "/dev/mtd0"));
+                b.AddConnector(new Flash("J0", "/dev/mtd0"));
                 continue;
             }
             if(t == "LCD") {
-                connectors.push_back(new Lcd("J0", "/dev/fb0"));
+                b.AddConnector(new Lcd("J0", "/dev/fb0"));
                 continue;
             }
             if(t == "RTC") {
-                connectors.push_back(new Rtc("J3", "eth0", rtc_addr));
+                b.AddConnector(new Rtc("J3", "eth0", rtc_addr));
                 continue;
             }
             if(t == "BEEPER") {
-                connectors.push_back(new Beeper("L52", "/dev/null"));
+                b.AddConnector(new Beeper("L52", "/dev/null"));
                 continue;
             }
             if(t == "SPEAKER") {
-                connectors.push_back(new Speaker("L52", "/dev/null"));
+                b.AddConnector(new Speaker("L52", "/dev/null"));
                 continue;
             }
 
             /* Invalid test */
             std::cout << "Invalid test: " << t << std::endl;
 
-            for(auto c : connectors) {
-                delete c;
-            }
+            b.Reset();
 
             return 1;
         }
     }
 
-    if (connectors.size() > 0) {
-        fs.open("test_log.txt", std::fstream::out | std::fstream::trunc);
-        for(auto c : connectors) {
-            c->set_verbose(verbose);
-            c->Test();
-            std::cout << *c << std::endl;
-
-            /* save to test log */
-            fs << "Connector: " << c->GetName() << std::endl;
-            fs << "Status: " << c->get_connector_result().rv << std::endl;
-            fs << "**********************" << std::endl;
-            fs << "Output: " << c->get_connector_result().output << std::endl << std::endl;
-        }
-        std::cout << std::endl << "Test Complete" << std::endl;
-
-        for(auto c : connectors) {
-            delete c;
-        }
-
-        /* close test log */
-        fs.close();
-    }
+    b.Test();
 
     /* assign mac if set */
     if (mac.length() > 0) {
