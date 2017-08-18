@@ -101,6 +101,7 @@ bool Board::AssignMac(const std::string addr)
     auto mac_0_rv       = true;
     auto mac_1_rv       = true;
     uint8_t mac_addr[6] = {0};
+    std::string out;
 
     /* remove any : */
     for (auto c: addr) {
@@ -127,6 +128,9 @@ bool Board::AssignMac(const std::string addr)
     //std::cout << "0x" << std::hex << mac_0_n << std::endl;
     //std::cout << "0x" << std::hex << mac_1_n << std::endl;
 
+    /* load the fsl_otp kernel module so the sys interface is available */
+    CmdRunner::Run("modprobe fsl_otp", out);
+
     /* /sys/fsl_otp/HW_OCOTP_MAC0 holds the OUI, lower 4 bytes (0x8C:XX:XX:XX) */
     fp_mac_0_ = fopen(MAC0, "a+b");
     if (fp_mac_0_ == nullptr) {
@@ -144,6 +148,9 @@ bool Board::AssignMac(const std::string addr)
     /* check new and current and save */
     mac_0_rv = testAndSetMac(mac_0_n, fp_mac_0_);
     mac_1_rv = testAndSetMac(mac_1_n, fp_mac_1_);
+
+    /* unload the fsl_otp kernel module */
+    CmdRunner::Run("modprobe -r fsl_otp", out);
     
     return mac_0_rv || mac_1_rv;
 }
@@ -187,6 +194,7 @@ bool Board::ifUpDown(bool up)
 {
     std::string ip_cmd;
     std::string route_cmd;
+    std::string ping_cmd;
     std::string out;
 
     ip_cmd.append("ifconfig ");
@@ -204,7 +212,7 @@ bool Board::ifUpDown(bool up)
             CmdRunner::Run(route_cmd, out);
         }
         /* give the link some time to come up */
-        sleep(2);
+        sleep(3);
     } else {
         ip_cmd.append(" down");
         CmdRunner::Run(ip_cmd, out);
