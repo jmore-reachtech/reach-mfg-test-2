@@ -3,6 +3,8 @@
 
 #include <string>
 
+#define PING_MAX 10
+
 class Connector
 {
 public:

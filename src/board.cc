@@ -207,12 +207,15 @@ bool Board::ifUpDown(bool up)
 
         /* if there is a gateway set, add the route */
         if (ip_gw_.length() > 0) {
-            route_cmd.append("route add default gateway ");
+            route_cmd.append("route add default gw ");
             route_cmd.append(ip_gw_);
             CmdRunner::Run(route_cmd, out);
         }
         /* give the link some time to come up */
         sleep(3);
+        //TODO: add name serves to /etc/resolv.conf
+        //nameserver 8.8.8.8
+        //nameserver 8.8.4.4
     } else {
         ip_cmd.append(" down");
         CmdRunner::Run(ip_cmd, out);
