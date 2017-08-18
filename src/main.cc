@@ -39,7 +39,9 @@ static void showUsage(std::string name)
     std::cout << "  TEST_RTC_SERVER_ADDR                Time server address to test RTC" << std::endl;
     std::cout << "                                          Defaults to: 10.10.10.2" << std::endl;
     std::cout << "  TEST_MODULE_ADDR                    Module local IP address" << std::endl;
-    std::cout << "                                          Defaults to: 10.10.10.3" << std::endl << std::endl;
+    std::cout << "                                          Defaults to: 10.10.10.3" << std::endl;
+    std::cout << "  TEST_MODULE_GATEWAY                 Module default gateway address" << std::endl;
+    std::cout << "                                          Defaults to: not set" << std::endl << std::endl;
 }
 
 static void listTests(void)
@@ -112,6 +114,9 @@ int main(int argc, char** argv)
     }
     if(const char* env_p = std::getenv("TEST_MODULE_ADDR")) {
         b.SetIpAddr(env_p);
+    }
+    if(const char* env_p = std::getenv("TEST_MODULE_GATEWAY")) {
+        b.SetIpGateway(env_p);
     }
 
     if(argc == 1) {

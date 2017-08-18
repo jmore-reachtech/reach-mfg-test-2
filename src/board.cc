@@ -12,7 +12,7 @@
 #include "board.h"
 #include "cmdrunner.h"
 
-Board::Board(): verbose_(false), ip_addr_("")
+Board::Board(): verbose_(false), ip_addr_(DEFAULT_LOCAL_ADDR), ip_gw_(DEFAULT_LOCAL_GATEWAY)
 {
 }
 
@@ -42,6 +42,11 @@ void Board::SetVerbose(bool v)
 void Board::SetIpAddr(std::string ip)
 {
     ip_addr_ = ip;
+}
+
+void Board::SetIpGateway(std::string ip)
+{
+    ip_gw_ = ip;
 }
 
 bool Board::Test(void)
@@ -180,23 +185,29 @@ bool Board::testAndSetMac(uint32_t mac_new, FILE* fp)
 
 bool Board::ifUpDown(bool up)
 {
-    std::string cmd;
+    std::string ip_cmd;
+    std::string route_cmd;
     std::string out;
 
-    cmd.append("ifconfig ");
-    cmd.append(DEFAULT_ETH_INTERFACE);
+    ip_cmd.append("ifconfig ");
+    ip_cmd.append(DEFAULT_ETH_INTERFACE);
     if (up) {
-        cmd.append(" netmask 255.255.255.0 ");
-        if (ip_addr_.length() == 0) {
-            cmd.append(DEFAULT_LOCAL_ADDR);
-        } else {
-            cmd.append(ip_addr_);
+        ip_cmd.append(" netmask 255.255.255.0 ");
+        ip_cmd.append(ip_addr_);
+        ip_cmd.append(" up");
+        CmdRunner::Run(ip_cmd, out);
+
+        /* if there is a gateway set, add the route */
+        if (ip_gw_.length() > 0) {
+            route_cmd.append("route add default gateway ");
+            route_cmd.append(ip_gw_);
+            CmdRunner::Run(route_cmd, out);
         }
-        cmd.append(" up");
-        CmdRunner::Run(cmd, out);
+        /* give the link some time to come up */
+        sleep(2);
     } else {
-        cmd.append(" down");
-        CmdRunner::Run(cmd, out);
+        ip_cmd.append(" down");
+        CmdRunner::Run(ip_cmd, out);
     }
 
     return false;
