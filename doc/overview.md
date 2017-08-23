@@ -52,7 +52,7 @@ RTC       (J0)
 # mfg-test --tests TOUCH
 ```
 ### Expected Results:
-This **TOUCH** test will launch ts_calibrate. The ability to touch calibrate the panel is a successful test.
+The **TOUCH** test will launch **ts_calibrate**. The ability to touch calibrate the panel is a successful test.
 
 ## AUART1 (J2) Test
 ```bash
@@ -63,8 +63,12 @@ The **AUART** test will send the character **'a'** and expects to receive the le
 
 ## AUART3 (J25) Test
 - For full duplex boards add the **--half-duplex** option
+
 ```bash
 # mfg-test --tests AUART3
+```
+```bash
+# mfg-test --half-duplex --tests AUART3
 ```
 ### Expected Results:
 The **AUART** test will send the character **'a'** and expects to receive the letter **'A'**.
@@ -81,14 +85,14 @@ The **AUART** test will send the character **'a'** and expects to receive the le
 # mfg-test --tests I2C
 ```
 ### Expected Results:
-The **I2C** test expects to see a slave address of **0x05** with a control register of **0xC**. A successful test will receive one byte of **0x3**.
+The **I2C** test expects to see a slave address at **0x05** with a control register of **0x0C**. A successful test will receive one byte of **0x03**.
 
 ## CAN (J20) Test
 ```bash
 # mfg-test --tests CAN
 ```
 ### Expected Results:
-The **CAN** test sets the CAN frame ID to **0x3E** sets 2 bytes for the payload. The payload bytes are **0xDE** and **0xAD**. The CAN test expects to read one CAN frame with a 2 byte payload of **0xBE** and **0xEF**.
+The **CAN** test sets the CAN frame ID to **0x3E** and sets 2 bytes for the payload. The payload bytes are **0xDE** and **0xAD**. The CAN test expects to read one CAN frame with a 2 byte payload of **0xBE** and **0xEF**.
 
 ## ETHERNET (J3) Test
 - The default server address for the **ETHERNET** test is **10.10.10.2**. The sever address can be overwritten by setting the environment variable **TEST_WEB_SERVER_ADDR**.
@@ -132,9 +136,9 @@ The **GPIO** test will walk a 1 across the lower four pins and then the upper fo
 # mfg-test --tests FLASH
 ```
 ### Expected Results:
-The **FLASH** test will run nandtest over each MTD, /dev/mtd[0-6]. A successful test will be the test cumulative restutls of all the nandtest invocations.
+The **FLASH** test will run **nandtest** over each MTD, **/dev/mtd[0-6]**. A successful test will be the cumulative results of all the **nandtest** invocations.
 
-**Note:** This test will read/write each page and can take up to **8** minutes.
+**Note:** This test will **read/write** each page and can take up to **8** minutes.
 
 ## LCD (J0) Test
 ```bash
