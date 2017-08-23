@@ -62,7 +62,7 @@ The **TOUCH** test will launch **ts_calibrate**. The ability to touch calibrate 
 The **AUART** test will send the character **'a'** and expects to receive the letter **'A'**.
 
 ## AUART3 (J25) Test
-- For full duplex boards add the **--half-duplex** option
+- For **half duplex** boards add the **--half-duplex** option
 
 ```bash
 # mfg-test --tests AUART3
