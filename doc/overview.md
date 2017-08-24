@@ -22,7 +22,7 @@
         							Defaults to: 10.10.10.2
         TEST_MODULE_ADDR		Module local IP address
         							Defaults to: 10.10.10.3
-        TEST_MODULE_GATEWAY		Module default gateway address
+        TEST_MODULE_GATEWAY     Module default gateway address
         							Defaults to: not set
 ```
 ## List Tests
