@@ -17,6 +17,7 @@ CANOBJS		:= $(patsubst $(LIBDIR)/%,$(BUILDDIR)/%,$(CANSRCS:.$(CANSRCEXT)=.o))
 
 $(TARGET): $(OBJECTS) $(CANOBJS)
 	@echo " Linking..."
+	mkdir -p ./bin
 	@echo " $(CXX) $^ -o $(TARGET) $(LIB)"; $(CXX) $^ -o $(TARGET) $(LIB)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)

@@ -19,6 +19,7 @@
 #include "rtc.h"
 #include "beeper.h"
 #include "speaker.h"
+#include "gpio2.h"
 
 static void showUsage(std::string name)
 {
@@ -61,7 +62,8 @@ static void listTests(void)
     std::cout << "LCD       (J0)" << std::endl;
     std::cout << "BEEPER    (L52)" << std::endl;
     std::cout << "SPEAKER   (L52)" << std::endl;
-    std::cout << "RTC       (J0)" << std::endl << std::endl;
+    std::cout << "RTC       (J0)" << std::endl;
+    std::cout << "GPIO2     (J21)" << std::endl << std::endl;
 }
 
 std::vector<std::string> split(std::string s)
@@ -243,6 +245,10 @@ int main(int argc, char** argv)
             }
             if(t == "SPEAKER") {
                 b.AddConnector(new Speaker("L52", "/dev/null"));
+                continue;
+            }
+            if(t == "GPIO2") {
+                b.AddConnector(new Gpio2("J21", "/dev/ttymxc4"));
                 continue;
             }
 
