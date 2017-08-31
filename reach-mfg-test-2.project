@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Project Name="reach-mfg-test-2" Version="10.0.0" InternalType="">
+  <Plugins>
+    <Plugin Name="qmake">
+      <![CDATA[00010001N0005Debug000000000000]]>
+    </Plugin>
+  </Plugins>
   <Reconciliation>
     <Regexes/>
     <Excludepaths/>
@@ -9,11 +14,6 @@
     </Extensions>
     <Topleveldir>../reach-mfg-test-2</Topleveldir>
   </Reconciliation>
-  <Plugins>
-    <Plugin Name="qmake">
-      <![CDATA[00010001N0005Debug000000000000]]>
-    </Plugin>
-  </Plugins>
   <VirtualDirectory Name="include">
     <VirtualDirectory Name="linux">
       <File Name="include/linux/i2c-dev.h"/>
@@ -60,6 +60,13 @@
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
+  <VirtualDirectory Name="lib">
+    <File Name="lib/libsocketcan.c"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="reach-mfg-test-2">
+    <File Name="tags"/>
+    <File Name="Makefile"/>
+  </VirtualDirectory>
   <Settings Type="Dynamic Library">
     <GlobalSettings>
       <Compiler Options="" C_Options="" Assembler="">
@@ -83,7 +90,7 @@
 CC=arm-linux-gnueabihf-gcc
 CXX=arm-linux-gnueabihf-g++
 LD=arm-linux-gnueabihf-ld
-REMOTE_HOST=192.168.0.16]]>
+REMOTE_HOST=172.28.52.152]]>
       </Environment>
       <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
         <DebuggerSearchPaths/>
@@ -154,11 +161,4 @@ REMOTE_HOST=192.168.0.16]]>
       </Completion>
     </Configuration>
   </Settings>
-  <VirtualDirectory Name="lib">
-    <File Name="lib/libsocketcan.c"/>
-  </VirtualDirectory>
-  <VirtualDirectory Name="reach-mfg-test-2">
-    <File Name="tags"/>
-    <File Name="Makefile"/>
-  </VirtualDirectory>
 </CodeLite_Project>

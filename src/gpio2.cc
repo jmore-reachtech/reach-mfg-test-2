@@ -10,13 +10,15 @@
 
 
 #include "gpio2.h"
+#include "cmdrunner.h"
 
 Gpio2::Gpio2(): Connector("Unknown", "/dev/null")
 {
     std::cout << "Creating GPIO2 port" << std::endl;
 }
 
-Gpio2::Gpio2(std::string connector, std::string device): Connector(connector, device)
+Gpio2::Gpio2(std::string connector, std::string device): Connector(connector, device), 
+    gpio_42_(), gpio_175_()
 {
     if (verbose_)
         std::cout << "Creating GPIO2 conector " << connector << " using device " << device << std::endl;
@@ -24,29 +26,43 @@ Gpio2::Gpio2(std::string connector, std::string device): Connector(connector, de
 
 Gpio2::~Gpio2()
 {
+    std::string log;
+
     if (verbose_)
         std::cout << "Destroying GPIO2 port" << std::endl; 
 
     if (fd_ > 0) {
         close(fd_);
     }
+    
+    if (export_fd_ > 0) {
+        fclose(export_fd_);
+    }
+    
+    if (unexport_fd_ > 0) {
+        fclose(unexport_fd_);
+    }
 }
 
 bool Gpio2::Test()
 {
     struct termios tcs;
-    struct timeval timeout;
     auto rv = 0;
-    char send[2]{'a', '\0'};
+    char send[2]{0x06, '\0'};
     char recv[2]{'\0', '\0'};
-    fd_set rfds;
     struct serial_rs485 rs485conf;
+    std::string log;
 
-    result_.rv = false;
+    result_.rv = true;
     result_.output.clear();
     
     if (verbose_)
         std::cout << "Running UART Test" << std::endl;
+
+    if (!setup_gpio()) {
+        result_.output.append("Error setting up GPIO SYS interfaces");
+        goto out;
+    }
 
     memset(&tcs, 0, sizeof(tcs));
     tcs.c_iflag = 0;
@@ -91,7 +107,60 @@ bool Gpio2::Test()
         result_.rv = true;
         goto out;
     }
+
+    receiveData(recv, 2);
     
+    result_.rv = ((recv[0] == 0x0) && (recv[1] = 0x1));
+
+out:
+    return result_.rv;
+}
+
+bool Gpio2::setup_gpio()
+{
+    int rv = 0;
+    
+    if ((export_fd_ = fopen(SYS_EXPORT, "w")) == nullptr) {
+        return false;
+    }
+    if ((unexport_fd_ = fopen(SYS_UNEXPORT, "w")) == nullptr) {
+        return false;
+    }
+    
+    fprintf(export_fd_, "%d", 42);
+    //fwrite("42", sizeof(char), 2, export_fd_);    
+    if ((gpio_42_.dir_fd = fopen(SYS_GPIO_42_DIR, "r+")) == nullptr) {
+        std::cout << "error open dir: " << errno << std::endl;
+        return false;
+    }
+    if ((gpio_42_.val_fd = fopen(SYS_GPIO_42_VAL, "r+")) == nullptr) {
+        std::cout << "error open val: " << errno << std::endl;
+        return false;
+    }
+    fprintf(gpio_42_.dir_fd, "%s", "out");
+    //fwrite("out", sizeof(char), 3, gpio_42_.dir_fd);
+    fprintf(gpio_42_.val_fd, "%s", "1");
+    //fwrite("1", sizeof(char), 1, gpio_42_.val_fd);
+    
+//    write(export_fd_, "175", 2);
+//    if ((gpio_175_.dir_fd = open(SYS_GPIO_175_DIR, O_RDWR)) == -1) {
+//        return false;
+//    }
+//    if ((gpio_175_.val_fd = open(SYS_GPIO_175_VAL, O_RDWR)) == -1) {
+//        return false;
+//    }
+//    write(gpio_175_.dir_fd, "out", 3);
+//    write(gpio_175_.val_fd, "1", 1);
+    
+    return true;
+}
+
+int Gpio2::receiveData(char *buf, int size)
+{
+    struct timeval timeout;
+    fd_set rfds;
+    auto rv = 0;
+
     timeout.tv_sec = 1;
     timeout.tv_usec = 0;
     
@@ -103,37 +172,26 @@ bool Gpio2::Test()
         result_.output.append("Error: select() failed: ");
         result_.output.append(device_);
         result_.rv = true;
-        goto out;
+        return -1;
     }
     else if (rv) {
-        rv = read(fd_,recv,1);
+        rv = read(fd_, buf, size);
         if(rv != 1) {
             result_.output.append("Error: read() failed: ");
             result_.output.append(device_);
+            result_.output.append(" (");
+            result_.output.append(std::to_string(errno));
+            result_.output.append(" )");
             result_.rv = true;
-            goto out;
+            return -1;
 		}
-        
-//        /* we send lowercase 'a' 0x61 and should get back an uppercase 'A' 0x41 */
-//        send[0] -= 0x20;
-//        if(strcmp(send,recv)) {
-//            result_.output.append("Error: read() mismtach: ");
-//            result_.output.append(device_);
-//            result_.output.append(" Expected ");
-//            result_.output.append(std::to_string(send[0]));
-//            result_.output.append(", Got ");
-//            result_.output.append(std::to_string(recv[0]));
-//            result_.rv = true;
-//            goto out;
-//		}
 	}
     else {
         result_.output.append("Error: select() timeout: ");
         result_.output.append(device_);
         result_.rv = true;
-        goto out;
+        return -1;
 	}
 
-out:
-    return result_.rv;
+    return 0;
 }

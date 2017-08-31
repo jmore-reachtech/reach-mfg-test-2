@@ -14,6 +14,9 @@
 
 Board::Board(): verbose_(false), ip_addr_(DEFAULT_LOCAL_ADDR), ip_gw_(DEFAULT_LOCAL_GATEWAY)
 {
+    if(const char* env_p = std::getenv("TEST_NO_NETWORK_CLOBBER")) {
+        no_network_clobber_ = true;
+    }
 }
 
 Board::~Board()
@@ -55,7 +58,9 @@ bool Board::Test(void)
 
     if (connectors_.size() > 0) {
         /* bring up the eth interface */
-        this->ifUpDown(IF_UP);
+        if (!no_network_clobber_) {
+            this->ifUpDown(IF_UP);
+        }
         fs.open("test_log.txt", std::fstream::out | std::fstream::trunc);
         for(auto c : connectors_) {
             c->set_verbose(verbose_);
@@ -78,7 +83,9 @@ bool Board::Test(void)
         fs.close();
 
         /* bring down the eth interface */
-        this->ifUpDown(IF_DOWN);
+        if (!no_network_clobber_) {
+            this->ifUpDown(IF_DOWN);
+        }
     }
 
     return false;
@@ -196,6 +203,10 @@ bool Board::ifUpDown(bool up)
     std::string route_cmd;
     std::string ping_cmd;
     std::string out;
+
+    if (no_network_clobber_) {
+        return false;
+    }
 
     ip_cmd.append("ifconfig ");
     ip_cmd.append(DEFAULT_ETH_INTERFACE);

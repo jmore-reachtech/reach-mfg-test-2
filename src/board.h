@@ -35,6 +35,7 @@ private:
     bool verbose_;
     std::string ip_addr_;
     std::string ip_gw_;
+    bool no_network_clobber_{false};
 
     bool testAndSetMac(uint32_t new_mac, FILE *fp);
     bool ifUpDown(bool up);
