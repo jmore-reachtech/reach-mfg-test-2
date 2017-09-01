@@ -36,11 +36,11 @@ Gpio2::~Gpio2()
     }
     
     if (export_fd_ > 0) {
-        fclose(export_fd_);
+        close(export_fd_);
     }
     
     if (unexport_fd_ > 0) {
-        fclose(unexport_fd_);
+        close(unexport_fd_);
     }
 }
 
@@ -49,6 +49,7 @@ bool Gpio2::Test()
     struct termios tcs;
     auto rv = 0;
     char send[2]{0x06, '\0'};
+    char rst[2]{0x15, '\0'};
     char recv[2]{'\0', '\0'};
     struct serial_rs485 rs485conf;
     std::string log;
@@ -98,6 +99,32 @@ bool Gpio2::Test()
     if (verbose_)
         std::cout << "Opened " << device_ << std::endl;
     
+    /* send the CTS pin counter reset command byte*/
+    rv = write(fd_, rst, 1);
+    if (rv != 1) {
+        result_.output.append("Error writing to serial port: ");
+        result_.output.append(device_);
+        result_.output.append(" ");
+        result_.output.append(std::to_string(errno));
+        result_.rv = true;
+        goto out;
+    }
+    /* we get 2 bytes back */
+    if (receiveData(recv, 2)) {
+        std::cout << "error after rst recv " << device_ << std::endl;
+        goto out;
+    }
+    /* both bytes should be 0x0 */
+    if ((recv[0] != 0x0) || (recv[1] != 0x0)) {
+        result_.output.append("CTS reset invalid");
+        result_.rv = true;
+        goto out;
+    }
+
+    /* set one pin */
+    write(gpio_42_.val_fd, "1", 1);
+    write(gpio_175_.val_fd, "0", 1);
+    /* ask for data */
     rv = write(fd_, send, 1);
     if (rv != 1) {
         result_.output.append("Error writing to serial port: ");
@@ -107,55 +134,107 @@ bool Gpio2::Test()
         result_.rv = true;
         goto out;
     }
+    /* we get 2 bytes back; just read 1 byte at a time */
+    //TODO: fix receiveData to wait for both bytes
+    if (receiveData(recv,1)) {
+        goto out;
+    }
+    if (receiveData(&recv[1],1)) {
+        goto out;
+    }
+    /* check recv */
+    if (recv[0] != 0x10 || recv[1] != 0x02) {
+        result_.output.append("GPIO mismatch: ");
+        result_.rv = true;
+        goto out;
+    }
 
-    receiveData(recv, 2);
+    /* flip pin */
+    write(gpio_42_.val_fd, "0", 1);
+    write(gpio_175_.val_fd, "1", 1);
+    /* ask for data */
+    rv = write(fd_, send, 1);
+    if (rv != 1) {
+        result_.output.append("Error writing to serial port: ");
+        result_.output.append(device_);
+        result_.output.append(" ");
+        result_.output.append(std::to_string(errno));
+        result_.rv = true;
+        goto out;
+    }
+    /* we get 2 bytes back; just read 1 byte at a time */
+    //TODO: fix receiveData to wait for both bytes
+    if (receiveData(recv,1)) {
+        goto out;
+    }
+    if (receiveData(&recv[1],1)) {
+        goto out;
+    }
+    /* check recv */
+    if (recv[0] != 0x01 || recv[1] != 0x04) {
+        result_.output.append("GPIO mismatch: ");
+        result_.rv = true;
+        goto out;
+    }
     
-    result_.rv = ((recv[0] == 0x0) && (recv[1] = 0x1));
+    result_.rv = false;
 
 out:
+    teardown_gpio();
     return result_.rv;
 }
 
 bool Gpio2::setup_gpio()
 {
-    int rv = 0;
-    
-    if ((export_fd_ = fopen(SYS_EXPORT, "w")) == nullptr) {
+    if ((export_fd_ = open(SYS_EXPORT, O_WRONLY)) == -1) {
         return false;
     }
-    if ((unexport_fd_ = fopen(SYS_UNEXPORT, "w")) == nullptr) {
+    if ((unexport_fd_ = open(SYS_UNEXPORT, O_WRONLY)) == -1) {
         return false;
     }
     
-    fprintf(export_fd_, "%d", 42);
-    //fwrite("42", sizeof(char), 2, export_fd_);    
-    if ((gpio_42_.dir_fd = fopen(SYS_GPIO_42_DIR, "r+")) == nullptr) {
-        std::cout << "error open dir: " << errno << std::endl;
+    write(export_fd_, "42", 2);
+    if ((gpio_42_.dir_fd = open(SYS_GPIO_42_DIR, O_RDWR)) == -1) {
+        std::cout << "error open 42 dir: " << errno << std::endl;
         return false;
     }
-    if ((gpio_42_.val_fd = fopen(SYS_GPIO_42_VAL, "r+")) == nullptr) {
-        std::cout << "error open val: " << errno << std::endl;
+    if ((gpio_42_.val_fd = open(SYS_GPIO_42_VAL, O_RDWR)) == -1) {
+        std::cout << "error open  42 val: " << errno << std::endl;
         return false;
     }
-    fprintf(gpio_42_.dir_fd, "%s", "out");
-    //fwrite("out", sizeof(char), 3, gpio_42_.dir_fd);
-    fprintf(gpio_42_.val_fd, "%s", "1");
-    //fwrite("1", sizeof(char), 1, gpio_42_.val_fd);
+    write(gpio_42_.dir_fd, "out", 3);
+    write(gpio_42_.val_fd, "0", 1);
     
-//    write(export_fd_, "175", 2);
-//    if ((gpio_175_.dir_fd = open(SYS_GPIO_175_DIR, O_RDWR)) == -1) {
-//        return false;
-//    }
-//    if ((gpio_175_.val_fd = open(SYS_GPIO_175_VAL, O_RDWR)) == -1) {
-//        return false;
-//    }
-//    write(gpio_175_.dir_fd, "out", 3);
-//    write(gpio_175_.val_fd, "1", 1);
+    write(export_fd_, "175", 3);
+    if ((gpio_175_.dir_fd = open(SYS_GPIO_175_DIR, O_RDWR)) == -1) {
+        std::cout << "error open 175 dir: " << errno << std::endl;
+        return false;
+    }
+    if ((gpio_175_.val_fd = open(SYS_GPIO_175_VAL, O_RDWR)) == -1) {
+        std::cout << "error open 175 val: " << errno << std::endl;
+        return false;
+    }
+    write(gpio_175_.dir_fd, "out", 3);
+    write(gpio_175_.val_fd, "0", 1);
     
     return true;
 }
 
-int Gpio2::receiveData(char *buf, int size)
+bool Gpio2::teardown_gpio()
+{
+    /* reset gpio to in and low */
+    write(gpio_42_.val_fd, "0", 1);
+    write(gpio_42_.dir_fd, "in", 2);
+    write(unexport_fd_, "42", 2);
+    
+    write(gpio_175_.val_fd, "0", 1);
+    write(gpio_175_.dir_fd, "in", 2);
+    write(unexport_fd_, "175", 3);
+
+    return true;
+}
+
+bool Gpio2::receiveData(char *buf, int size)
 {
     struct timeval timeout;
     fd_set rfds;
@@ -172,26 +251,28 @@ int Gpio2::receiveData(char *buf, int size)
         result_.output.append("Error: select() failed: ");
         result_.output.append(device_);
         result_.rv = true;
-        return -1;
+        return true;
     }
     else if (rv) {
         rv = read(fd_, buf, size);
-        if(rv != 1) {
+        if(rv != size) {
+            std::cout << "read " << rv << " bytes, expected " << size << " bytes " 
+                << std::endl;
             result_.output.append("Error: read() failed: ");
             result_.output.append(device_);
             result_.output.append(" (");
             result_.output.append(std::to_string(errno));
             result_.output.append(" )");
             result_.rv = true;
-            return -1;
+            return true;
 		}
 	}
     else {
         result_.output.append("Error: select() timeout: ");
         result_.output.append(device_);
         result_.rv = true;
-        return -1;
+        return true;
 	}
 
-    return 0;
+    return false;
 }

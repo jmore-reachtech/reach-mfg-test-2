@@ -18,21 +18,22 @@ public:
     virtual ~Gpio2();
     
     struct gpio_sys_handle {
-        FILE *dir_fd;
-        FILE *val_fd;
+        int dir_fd;
+        int val_fd;
     };
 
     virtual bool Test();
 
 private:
     int fd_{0};
-    FILE * export_fd_{0};
-    FILE * unexport_fd_{0};
+    int export_fd_{0};
+    int unexport_fd_{0};
     gpio_sys_handle gpio_42_;
     gpio_sys_handle gpio_175_;
     
-    int receiveData(char *buf, int size);
+    bool receiveData(char *buf, int size);
     bool setup_gpio(void);
+    bool teardown_gpio(void);
 };
 
 #endif // GPIO2_H
