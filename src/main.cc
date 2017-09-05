@@ -42,6 +42,8 @@ static void showUsage(std::string name)
     std::cout << "  TEST_MODULE_ADDR                    Module local IP address" << std::endl;
     std::cout << "                                          Defaults to: 10.10.10.3" << std::endl;
     std::cout << "  TEST_MODULE_GATEWAY                 Module default gateway address" << std::endl;
+    std::cout << "                                          Defaults to: not set" << std::endl;
+    std::cout << "  TEST_NO_NETWORK_CLOBBER             Do not reset the module IP address" << std::endl;
     std::cout << "                                          Defaults to: not set" << std::endl << std::endl;
 }
 

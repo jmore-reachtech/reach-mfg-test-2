@@ -14,7 +14,7 @@
 
 Board::Board(): verbose_(false), ip_addr_(DEFAULT_LOCAL_ADDR), ip_gw_(DEFAULT_LOCAL_GATEWAY)
 {
-    if(const char* env_p = std::getenv("TEST_NO_NETWORK_CLOBBER")) {
+    if(std::getenv("TEST_NO_NETWORK_CLOBBER") != nullptr) {
         no_network_clobber_ = true;
     }
 }

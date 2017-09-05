@@ -10,6 +10,13 @@
 #define SYS_GPIO_175_DIR    "/sys/class/gpio/gpio175/direction"
 #define SYS_GPIO_175_VAL    "/sys/class/gpio/gpio175/value"
 
+#define GPIO_DIR_IN     "in"
+#define GPIO_DIR_OUT    "out"
+#define GPIO_PIN_LOW    "0"
+#define GPIO_PIN_HIGH   "1" 
+#define GPIO_PIN_42     "42"
+#define GPIO_PIN_175    "175"
+
 class Gpio2: public Connector {
 
 public:

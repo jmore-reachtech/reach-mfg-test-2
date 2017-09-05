@@ -122,8 +122,8 @@ bool Gpio2::Test()
     }
 
     /* set one pin */
-    write(gpio_42_.val_fd, "1", 1);
-    write(gpio_175_.val_fd, "0", 1);
+    write(gpio_42_.val_fd, GPIO_PIN_HIGH, sizeof(GPIO_PIN_HIGH));
+    write(gpio_175_.val_fd, GPIO_PIN_LOW, sizeof(GPIO_PIN_LOW));
     /* ask for data */
     rv = write(fd_, send, 1);
     if (rv != 1) {
@@ -150,8 +150,8 @@ bool Gpio2::Test()
     }
 
     /* flip pin */
-    write(gpio_42_.val_fd, "0", 1);
-    write(gpio_175_.val_fd, "1", 1);
+    write(gpio_42_.val_fd, GPIO_PIN_LOW, sizeof(GPIO_PIN_LOW));
+    write(gpio_175_.val_fd, GPIO_PIN_HIGH, sizeof(GPIO_PIN_HIGH));
     /* ask for data */
     rv = write(fd_, send, 1);
     if (rv != 1) {
@@ -193,7 +193,7 @@ bool Gpio2::setup_gpio()
         return false;
     }
     
-    write(export_fd_, "42", 2);
+    write(export_fd_, GPIO_PIN_42, sizeof(GPIO_PIN_42));
     if ((gpio_42_.dir_fd = open(SYS_GPIO_42_DIR, O_RDWR)) == -1) {
         std::cout << "error open 42 dir: " << errno << std::endl;
         return false;
@@ -202,10 +202,10 @@ bool Gpio2::setup_gpio()
         std::cout << "error open  42 val: " << errno << std::endl;
         return false;
     }
-    write(gpio_42_.dir_fd, "out", 3);
-    write(gpio_42_.val_fd, "0", 1);
+    write(gpio_42_.dir_fd, GPIO_DIR_OUT, sizeof(GPIO_DIR_OUT));
+    write(gpio_42_.val_fd, GPIO_PIN_LOW, sizeof(GPIO_PIN_LOW));
     
-    write(export_fd_, "175", 3);
+    write(export_fd_, GPIO_PIN_175, sizeof(GPIO_PIN_175));
     if ((gpio_175_.dir_fd = open(SYS_GPIO_175_DIR, O_RDWR)) == -1) {
         std::cout << "error open 175 dir: " << errno << std::endl;
         return false;
@@ -214,8 +214,8 @@ bool Gpio2::setup_gpio()
         std::cout << "error open 175 val: " << errno << std::endl;
         return false;
     }
-    write(gpio_175_.dir_fd, "out", 3);
-    write(gpio_175_.val_fd, "0", 1);
+    write(gpio_175_.dir_fd, GPIO_DIR_OUT, sizeof(GPIO_DIR_OUT));
+    write(gpio_175_.val_fd, GPIO_PIN_LOW, sizeof(GPIO_PIN_LOW));
     
     return true;
 }
@@ -223,13 +223,13 @@ bool Gpio2::setup_gpio()
 bool Gpio2::teardown_gpio()
 {
     /* reset gpio to in and low */
-    write(gpio_42_.val_fd, "0", 1);
-    write(gpio_42_.dir_fd, "in", 2);
-    write(unexport_fd_, "42", 2);
+    write(gpio_42_.val_fd, GPIO_PIN_LOW, sizeof(GPIO_PIN_LOW));
+    write(gpio_42_.dir_fd, GPIO_DIR_IN, sizeof(GPIO_DIR_IN));
+    write(unexport_fd_, GPIO_PIN_42, sizeof(GPIO_PIN_42));
     
-    write(gpio_175_.val_fd, "0", 1);
-    write(gpio_175_.dir_fd, "in", 2);
-    write(unexport_fd_, "175", 3);
+    write(gpio_175_.val_fd, GPIO_PIN_LOW, sizeof(GPIO_PIN_LOW));
+    write(gpio_175_.dir_fd, GPIO_DIR_IN, sizeof(GPIO_DIR_IN));
+    write(unexport_fd_, GPIO_PIN_175, sizeof(GPIO_PIN_175));
 
     return true;
 }
