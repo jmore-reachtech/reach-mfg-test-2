@@ -16,14 +16,16 @@
             --version       Display Program version
             
     Environment:
-    	TEST_WEB_SERVER_ADDR	Web server address to test ETHERNET
-        							Defaults to: 10.10.10.2
-        TEST_RTC_SERVER_ADDR	Time server address to test RTC
-        							Defaults to: 10.10.10.2
-        TEST_MODULE_ADDR		Module local IP address
-        							Defaults to: 10.10.10.3
-        TEST_MODULE_GATEWAY     Module default gateway address
-        							Defaults to: not set
+    	TEST_WEB_SERVER_ADDR		Web server address to test ETHERNET
+        								Defaults to: 10.10.10.2
+        TEST_RTC_SERVER_ADDR		Time server address to test RTC
+        								Defaults to: 10.10.10.2
+        TEST_MODULE_ADDR			Module local IP address
+        								Defaults to: 10.10.10.3
+        TEST_MODULE_GATEWAY     	Module default gateway address
+        								Defaults to: not set
+        TEST_NO_NETWORK_CLOBBER 	Do not reset the module IP address
+        								Defaults to: not set
 ```
 ## List Tests
 ```bash
@@ -46,6 +48,7 @@ LCD       (J0)
 BEEPER    (L52)
 SPEAKER   (L52)
 RTC       (J0)
+GPIO2     (J21)
 ```
 ## TOUCH Test
 ```bash
@@ -176,3 +179,12 @@ The **SPEAKER** test plays an audio beep. Manual inspection is required to valid
 ```
 ### Expected Results:
 The **RTC** test will use the **TEST_RTC_SERVER_ADDR** to run the **rdate** command and set the system time. If the system time is set successfully the **RTC** test will set the hwclock based on the system time. A successful test is when both commands complete sucessfully.
+
+## GPIO2 (J21) Test
+- The **GPIO2** test uses the UART on **J21** to get the status of the GPIO pins and the CTS pin. The two GPIO pins on **J21** are set as **OUT** and **LOW**. The two GPIO pins are then set to **0x01** and **0x10**. After each GPIO pin set the UART sends out **0x06** to get the GPIO staus from the test board. The test board will respond with two bytes. The first byte contains the status of the GPIO with the upper 4 bits for one GPIO and the lower 4 bits for the other GPIO. The second byte contains the CTS pin toggle count. The test board accepts a CTS pin count reset of **0x15**
+
+```bash
+# mfg-test --tests GPIO2
+```
+### Expected Results:
+The **GPIO2** test sends out **0x15** over the UART on **J21** and should receive **0x00**, **0x00**. Then the GPIO pins are set to **0x10** and the **GPIO2** test sends out **0x06** over the UART on **J21**. The **GPIO2** test should receive **0x10**, **0x02**. Then the GPIO pins are set to **0x01** and the **GPIO2** test sends out **0x06** over the UART on **J21**. The **GPIO2** test should receive **0x01**, **0x04**.
