@@ -34,9 +34,9 @@ std::string Connector::ToString() const
     std::stringstream ss;
     ss << "Connector: " << this->name_;
     if (this->result_.rv) {
-        ss << "\t\tFailed";
+        ss << "\tFailed";
     } else {
-        ss << "\t\tPassed";
+        ss << "\tPassed";
     }
 
     return ss.str();
@@ -46,9 +46,25 @@ std::ostream &operator<<(std::ostream &out, const Connector &c)
 {
     out << "Connector: " << c.name_ << " ";
     if (c.result_.rv) {
-        out << "\033[0;31m" << "\t\tFailed";
+        out << "\033[0;31m";
+        if (c.name_.length() <= 3) {
+            out << "\t\t\t";
+        } else if (c.name_.length() > 11) {
+            out << "\t";
+        } else {
+            out << "\t\t";
+        }
+        out << "Failed";
     } else {
-        out << "\033[0;32m" << "\t\tPassed";
+        out << "\033[0;32m";
+        if (c.name_.length() <= 3) {
+            out << "\t\t\t";
+        } else if (c.name_.length() > 11) {
+            out << "\t";
+        } else {
+            out << "\t\t";
+        }
+        out << "Passed";
     }
     out << "\033[0m";
     
