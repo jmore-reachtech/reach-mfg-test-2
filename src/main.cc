@@ -260,7 +260,7 @@ int main(int argc, char** argv)
             }
 
             /* Invalid test */
-            Logger::GetLogger()->Log("Invalid Test");
+            Logger::GetLogger()->Log("Invalid Test: " + t);
 
             b.Reset();
 
@@ -274,12 +274,12 @@ int main(int argc, char** argv)
     /* assign mac if set */
     if (mac.length() > 0) {
         Board b;
-        auto rv = b.AssignMac(mac);
+        ret |= b.AssignMac(mac);
         
-        if (rv) {
-            std::cout << "Mac Address " << mac << " Write Failed!" << std::endl;
+        if (ret) {
+            Logger::GetLogger()->Log("MAC address: " + mac + " Failed!");
         } else {
-            std::cout << "Mac Address " << mac << " Write Success!" << std::endl;
+            Logger::GetLogger()->Log("MAC address: " + mac + " Success!");
         }
     }
 

@@ -109,7 +109,7 @@ bool Board::AssignMac(const std::string addr)
     }
 
     if (buf.size() != 12) {
-        std::cout << "Invalid MAC length!" << std::endl;
+        Logger::GetLogger()->Log("Invalid MAC length!");
         return true;
     }
 
@@ -132,14 +132,14 @@ bool Board::AssignMac(const std::string addr)
     /* /sys/fsl_otp/HW_OCOTP_MAC0 holds the OUI, lower 4 bytes (0x8C:XX:XX:XX) */
     fp_mac_0_ = fopen(MAC0, "a+b");
     if (fp_mac_0_ == nullptr) {
-        std::cout << "Failed to open HW_OCOTP_MAC0" << std::endl;
+        Logger::GetLogger()->Log("Failed to open HW_OCOTP_MAC0!");
         return true;
     }
 
     /* /sys/fsl_otp/HW_OCOTP_MAC1 holds the upper 2 bytes (0x30:68) */
     fp_mac_1_ = fopen(MAC1, "a+b");
     if (fp_mac_1_ == nullptr) {
-        std::cout << "Failed to open HW_OCOTP_MAC1" << std::endl;
+        Logger::GetLogger()->Log("Failed to open HW_OCOTP_MAC1!");
         return true;
     }
 
@@ -161,7 +161,7 @@ bool Board::testAndSetMac(uint32_t mac_new, FILE* fp)
     /* read current MAC */
     rv = fscanf(fp, "%X", &mac_cur);
     if (rv != 1) {
-        std::cout << "Failed to read HW_OCOTP_MACX: " << strerror(errno) << std::endl;
+        Logger::GetLogger()->Log("Failed to read HW_OCOTP_MACX!");
         return true;
     }
 
@@ -172,16 +172,16 @@ bool Board::testAndSetMac(uint32_t mac_new, FILE* fp)
 
     /* Mac set but does not match */
     if (mac_cur != 0x0) {
-        std::cout << "Mac set but mismatch! New: 0x" << std::hex << mac_new << ", Cur: 0x" << mac_cur << std::endl;
+        Logger::GetLogger()->Log("Mac set but mismatch!");
         return true;
     }
 
-    std::cout << "saving new mac: 0x" << mac_new << std::endl;
+    Logger::GetLogger()->Log("Saving new MAC!");
     rv = fprintf(fp, "0x%08X", mac_new); 
     fflush(fp);
     if (rv < 0)
     {
-        std::cout << "Error writng MAC: " << mac_new << " " << strerror(errno) << std::endl;
+        Logger::GetLogger()->Log("Error writing MAC!");
         return true;
     }
 
