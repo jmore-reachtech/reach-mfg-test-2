@@ -45,11 +45,11 @@ std::string Connector::ToString() const
 std::ostream &operator<<(std::ostream &out, const Connector &c)
 {
     out << "Connector: " << c.name_ << " ";
-    if (c.result_.rv)
+    if (c.result_.rv) {
         out << "\033[0;31m" << "\t\tFailed";
-    else
+    } else {
         out << "\033[0;32m" << "\t\tPassed";
-    
+    }
     out << "\033[0m";
     
     return out;

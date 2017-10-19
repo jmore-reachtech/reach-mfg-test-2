@@ -191,15 +191,15 @@ int main(int argc, char** argv)
         connector_tests = split(tests);
         for(auto t : connector_tests) {
             if(t == "TOUCH") {
-                b.AddConnector(new Touch("J0", "/dev/input/touchscreen0"));
+                b.AddConnector(new Touch("TOUCH", "/dev/input/touchscreen0"));
                 continue;
             }
             if(t == "AUART1") {
-                b.AddConnector(new Uart("J2", "/dev/ttymxc1"));
+                b.AddConnector(new Uart("AUART1 (J2)", "/dev/ttymxc1"));
                 continue;
             }
             if(t == "AUART3") {
-                Uart *u = new Uart("J25", "/dev/ttymxc3");
+                Uart *u = new Uart("AUART3 (J25)", "/dev/ttymxc3");
                 if (half_duplex) {
                     u->EnableHalfDuplex();
                 }
@@ -207,55 +207,55 @@ int main(int argc, char** argv)
                 continue;
             }
             if(t == "AUART4") {
-                b.AddConnector(new Uart("J21", "/dev/ttymxc4"));
+                b.AddConnector(new Uart("AUART4 (J21)", "/dev/ttymxc4"));
                 continue;
             }
             if(t == "I2C") {
-                b.AddConnector(new I2c("J21", "/dev/i2c-1"));
+                b.AddConnector(new I2c("I2C (J21)", "/dev/i2c-1"));
                 continue;
             }
             if(t == "CAN") {
-                b.AddConnector(new Can("J20", "can0"));
+                b.AddConnector(new Can("CAN (J20)", "can0"));
                 continue;
             }
             if(t == "ETHERNET") {
-                b.AddConnector(new Ethernet("J3", "eth0", server_addr));
+                b.AddConnector(new Ethernet("ETHERNET (J3)", "eth0", server_addr));
                 continue;
             }
             if(t == "USB1") {
-                b.AddConnector(new Usb("J4", "/dev/sda1"));
+                b.AddConnector(new Usb("USB1 (J4)", "/dev/sda1"));
                 continue;
             }
             if(t == "USB2") {
-                b.AddConnector(new Usb("J5", "/dev/sdb1"));
+                b.AddConnector(new Usb("USB2 (J5)", "/dev/sdb1"));
                 continue;
             }
             if(t == "GPIO") {
-                b.AddConnector(new Gpio("J22", "/dev/i2c-0"));
+                b.AddConnector(new Gpio("GPIO (J22)", "/dev/i2c-0"));
                 continue;
             }
             if(t == "FLASH") {
-                b.AddConnector(new Flash("J0", "/dev/mtd0"));
+                b.AddConnector(new Flash("FLASH", "/dev/mtd0"));
                 continue;
             }
             if(t == "LCD") {
-                b.AddConnector(new Lcd("J0", "/dev/fb0"));
+                b.AddConnector(new Lcd("LCD", "/dev/fb0"));
                 continue;
             }
             if(t == "RTC") {
-                b.AddConnector(new Rtc("J3", "eth0", rtc_addr));
+                b.AddConnector(new Rtc("RTC", "eth0", rtc_addr));
                 continue;
             }
             if(t == "BEEPER") {
-                b.AddConnector(new Beeper("L52", "/dev/null"));
+                b.AddConnector(new Beeper("BEEPER", "/dev/null"));
                 continue;
             }
             if(t == "SPEAKER") {
-                b.AddConnector(new Speaker("L52", "/dev/null"));
+                b.AddConnector(new Speaker("SPEAKER", "/dev/null"));
                 continue;
             }
             if(t == "GPIO2") {
-                b.AddConnector(new Gpio2("J21", "/dev/ttymxc4"));
+                b.AddConnector(new Gpio2("GPIO2 (J21)", "/dev/ttymxc4"));
                 continue;
             }
 
