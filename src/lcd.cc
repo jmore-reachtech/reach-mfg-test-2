@@ -6,6 +6,7 @@
 #include <sys/mman.h>
 
 #include "lcd.h"
+#include "logger.h"
 
 Lcd::Lcd(): Connector("Unknown", "/dev/null")
 {
@@ -13,20 +14,15 @@ Lcd::Lcd(): Connector("Unknown", "/dev/null")
 
 Lcd::Lcd(std::string connector, std::string device): Connector(connector, device)
 {
-    if (verbose_)
-        std::cout << "Creating LCD conector " << connector << " using device " << device << std::endl; 
 }
 
 Lcd::~Lcd()
 {
-    if (verbose_)
-        std::cout << "Destroying LCD conector " << std::endl; 
 }
 
 bool Lcd::Test()
 {
-    if (verbose_)
-        std::cout << "Running LCD Test" << std::endl;
+    Logger::GetLogger()->Log("Running LCD Test");
     
     int fbfd 				= 0;
     struct fb_var_screeninfo vinfo;
@@ -49,38 +45,37 @@ bool Lcd::Test()
     /* Open the file for reading and writing */
     fbfd = open("/dev/fb0", O_RDWR);
     if (fbfd == -1) {
-        //perror("Error: cannot open framebuffer device");
+        Logger::GetLogger()->Log("LCD failed to open /dev/fb0");
         return true;
     }
 
     /* Get fixed screen information */
     if (ioctl(fbfd, FBIOGET_FSCREENINFO, &finfo) == -1) {
-        //perror("Error reading fixed information");
+        Logger::GetLogger()->Log("LCD failed to get fixed screen info");
         return true;
     }
 
     /* Get variable screen information */
     if (ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo) == -1) {
-        //perror("Error reading variable information");
+        Logger::GetLogger()->Log("LCD failed to get variable screen info");
         return true;
     }
 
     /* Figure out the size of the screen in bytes */
     screensize = ((vinfo.xres * vinfo.yres * vinfo.bits_per_pixel) / 8);
     
-    if (verbose_)
-        std::cout << "/dev/fb0 size: " << screensize << std::endl;
+    Logger::GetLogger()->Log("LCD /dev/fb0 size " + std::to_string(screensize));
 
     /* Map the device to memory */
     fbp = (char *)mmap(0, screensize, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
     if ((int)fbp == -1) {
-        //perror("Error: failed to map framebuffer device to memory");
+        Logger::GetLogger()->Log("LCD mmap failed");
         return true;
     }
     
     if(!(image = fopen("/usr/share/mfg-test/fruit_girl.bmp", "rb+")))
     {
-        //printf("Error opening image file!\n");
+        Logger::GetLogger()->Log("LCD error opening image file");
         munmap(fbp, screensize);
         close(fbfd);
         return true;
@@ -112,19 +107,18 @@ bool Lcd::Test()
     fseek(image,30,SEEK_SET);
     fread(&bih.compress_type,4,1,image);
 
-    if (verbose_) {
-        std::cout << "***********************************\n" << std::endl;
-        std::cout << "Type:\t\t\t" << bfh.magic[0] << bfh.magic[1] << std::endl;
-        std::cout << "File Size:\t\t" << bfh.filesz << std::endl;
-        std::cout << "Data Offset:\t\t" << bfh.offset << std::endl;
-        std::cout << "Header Size:\t\t" << bih.header_sz << std::endl;
-        std::cout << "Height:\t\t\t" << bih.height << std::endl;
-        std::cout << "Width:\t\t\t" << bih.width << std::endl;
-        std::cout << "Number of planes:\t" << bih.nplanes << std::endl;
-        std::cout << "Bit Count:\t\t" << bih.depth << std::endl;
-        std::cout << "Compression:\t\t" << bih.compress_type << std::endl;
-        std::cout << "***********************************\n" << std::endl;
-    }
+    //TODO: get this in the log
+    //std::cout << "***********************************\n" << std::endl;
+    //std::cout << "Type:\t\t\t" << bfh.magic[0] << bfh.magic[1] << std::endl;
+    //std::cout << "File Size:\t\t" << bfh.filesz << std::endl;
+    //std::cout << "Data Offset:\t\t" << bfh.offset << std::endl;
+    //std::cout << "Header Size:\t\t" << bih.header_sz << std::endl;
+    //std::cout << "Height:\t\t\t" << bih.height << std::endl;
+    //std::cout << "Width:\t\t\t" << bih.width << std::endl;
+    //std::cout << "Number of planes:\t" << bih.nplanes << std::endl;
+    //std::cout << "Bit Count:\t\t" << bih.depth << std::endl;
+    //std::cout << "Compression:\t\t" << bih.compress_type << std::endl;
+    //std::cout << "***********************************\n" << std::endl;
     
     int padding = 0;
     int scanlinebytes = bih.width * 3;
@@ -137,7 +131,7 @@ bool Lcd::Test()
     uint8_t buffer[bfh.filesz - bfh.offset];
     ret = fread(&buffer, 1, sizeof(buffer), image);
     if (ret != sizeof(buffer)) {
-		//perror("Image read mismatch!");
+        Logger::GetLogger()->Log("LCD image read mismatch");
 	}
         
     uint8_t newbuf[bih.width * bih.height * 3];

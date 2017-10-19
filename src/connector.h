@@ -21,7 +21,7 @@ public:
     std::string GetDevice() const;
     std::string GetName() const;
     connector_result get_connector_result() const;
-    void set_verbose(bool verbose);
+    std::string ToString() const;
 
 private:
     
@@ -29,7 +29,6 @@ protected:
     std::string device_;
     std::string name_;
     connector_result result_;
-    bool verbose_;
 };
 
 #endif

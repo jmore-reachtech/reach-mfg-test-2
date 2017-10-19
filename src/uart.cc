@@ -9,25 +9,19 @@
 #include <sys/ioctl.h>
 
 #include "uart.h"
+#include "logger.h"
 
 Uart::Uart(): Connector("Unknown", "/dev/null")
 {
-    if (verbose_)
-        std::cout << "Creating UART port" << std::endl; 
 }
 
 Uart::Uart(std::string connector, std::string device): Connector(connector, device)
     , half_duplex_(false)
 {
-    if (verbose_)
-        std::cout << "Creating UART conector " << connector << " using device" << device << std::endl; 
 }
 
 Uart::~Uart()
 {
-    if (verbose_)
-        std::cout << "Destroying UART port" << std::endl;
-    
     if (fd_ > 0) {
         close(fd_);
     }
@@ -35,8 +29,7 @@ Uart::~Uart()
 
 void Uart::EnableHalfDuplex()
 {
-    if (verbose_)
-        std::cout << "Enabling half duplex" << std::endl;
+    Logger::GetLogger()->Log("Enabling half duplex");
     half_duplex_ = true;
 }
 
@@ -52,9 +45,8 @@ bool Uart::Test()
 
     result_.rv = false;
     result_.output.clear();
-    
-    if (verbose_)
-        std::cout << "Running UART Test" << std::endl;
+
+    Logger::GetLogger()->Log("Running UART Test");
 
     memset(&tcs, 0, sizeof(tcs));
     tcs.c_iflag = 0;
@@ -79,19 +71,18 @@ bool Uart::Test()
 
     if (half_duplex_) {
         if (ioctl(fd_, TIOCGRS485, &rs485conf) < 0) {
-            std::cout << "TIOCGRS485 ioctl failed " << device_ << std::endl;
+            Logger::GetLogger()->Log("TIOCGRS485 ioctl failed ");
         }
         /* enable RS485 mode: */
         rs485conf.flags |= SER_RS485_ENABLED;
 
         if (ioctl(fd_, TIOCSRS485, &rs485conf) < 0) {
-            std::cout << "TIOCSRS485 ioctl failed " << device_ << std::endl;
+            Logger::GetLogger()->Log("TIOCSRS485 ioctl failed ");
         }
     }
 
-    if (verbose_)
-        std::cout << "Opened " << device_ << std::endl;
-    
+    Logger::GetLogger()->Log("Opened " + device_);
+
     rv = write(fd_, send, 1);
     if (rv != 1) {
         result_.output.append("Error writing to serial port: ");
@@ -101,13 +92,13 @@ bool Uart::Test()
         result_.rv = true;
         goto out;
     }
-    
+
     timeout.tv_sec = 1;
     timeout.tv_usec = 0;
-    
+
     FD_ZERO(&rfds);
     FD_SET(fd_, &rfds);
-    
+
     rv = select(fd_+1, &rfds, NULL, NULL, &timeout);
     if (rv == -1) {
         result_.output.append("Error: select() failed: ");
@@ -122,8 +113,8 @@ bool Uart::Test()
             result_.output.append(device_);
             result_.rv = true;
             goto out;
-		}
-        
+        }
+
         /* we send lowercase 'a' 0x61 and should get back an uppercase 'A' 0x41 */
         send[0] -= 0x20;
         if(strcmp(send,recv)) {
@@ -135,14 +126,14 @@ bool Uart::Test()
             result_.output.append(std::to_string(recv[0]));
             result_.rv = true;
             goto out;
-		}
-	}
+        }
+    }
     else {
         result_.output.append("Error: select() timeout: ");
         result_.output.append(device_);
         result_.rv = true;
         goto out;
-	}
+    }
 
 out:
     return result_.rv;

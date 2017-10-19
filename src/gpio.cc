@@ -6,6 +6,7 @@
 
 #include "gpio.h"
 #include "linux/i2c-dev.h"
+#include "logger.h"
 
 Gpio::Gpio(): Connector("Unknown", "/dev/null")
 {
@@ -14,15 +15,10 @@ Gpio::Gpio(): Connector("Unknown", "/dev/null")
 
 Gpio::Gpio(std::string connector, std::string device): Connector(connector, device)
 {
-    if (verbose_)
-        std::cout << "Creating GPIO conector " << connector << " using device " << device << std::endl; 
 }
 
 Gpio::~Gpio()
 {
-    if (verbose_)
-        std::cout << "Destroying GPIO port" << std::endl; 
-
     if (fd_ > 0) {
         close(fd_);
     }
@@ -30,17 +26,13 @@ Gpio::~Gpio()
 
 bool Gpio::Test()
 {
-    if (verbose_)
-        std::cout << "Running GPIO Test" << std::endl;
+    Logger::GetLogger()->Log("Running GPIO Test");
 
     auto rv = 0;
     auto x 	= 0;
     
     result_.rv = false;
     result_.output.clear();
-
-    if (verbose_)
-        std::cout << "Running I2C" << std::endl; 
 
     fd_ = open(GetDevice().c_str(), O_RDWR);
     if (fd_ < 0) {

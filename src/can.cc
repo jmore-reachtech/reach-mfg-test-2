@@ -12,25 +12,19 @@
 #include "can.h"
 #include "libsocketcan.h"
 #include "cmdrunner.h"
+#include "logger.h"
 
 Can::Can(): Connector("Unknown", "/dev/null")
 {
-    if (verbose_)
-        std::cout << "Creating CAN port" << std::endl; 
 }
 
 Can::Can(std::string connector, std::string device): Connector(connector, device)
 {
-    if (verbose_)
-        std::cout << "Creating CAN conector " << connector << " using device " << device << std::endl; 
 }
 
 Can::~Can()
 {
     std::string out;
-    
-    if (verbose_)
-        std::cout << "Destroying CAN port" << std::endl;
     
     if (fd_ > 0) {
         close(fd_);
@@ -60,7 +54,7 @@ bool Can::Test()
     /* load the can kernel module */
     cmd = "modprobe flexcan";
     if ((CmdRunner::Run(cmd,result_.output))) {
-        std::cout << "Failed to load flexcan module" << std::endl;
+        Logger::GetLogger()->Log("Failed to load flexcan module");
         result_.rv = true;
         goto out;
     }
@@ -71,35 +65,35 @@ bool Can::Test()
     
     /* stop the can bus */
     if (can_do_stop(ifr.ifr_name) < 0) {
-        std::cout << "Failed to stop the CAN bus" << std::endl;
+        Logger::GetLogger()->Log("Failed to stop the CAN bus");
         result_.rv = true;
         goto out;
     }
     
     /* open socket */
     if ((fd_ = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
-        std::cout << "Failed to open the CAN bus socket" << std::endl;
+        Logger::GetLogger()->Log("Failed to open the CAN bus socket");
         result_.rv = true;
         goto out;
     }
     
     /* set the ifreq */
     if (ioctl(fd_, SIOGIFINDEX, &ifr) < 0) {
-        std::cout << "Failed to set the CAN bus ioctl" << std::endl;
+        Logger::GetLogger()->Log("Failed to set the CAN bus ioctl");
         result_.rv = true;
         goto out;
     }
     
     /* set the bitrate */
     if (can_set_bitrate(ifr.ifr_name, CAN_BAUD_RATE) < 0) {
-        std::cout << "Failed to set the CAN bus bitrate" << std::endl;
+        Logger::GetLogger()->Log("Failed to set the CAN bus bitrate");
         result_.rv = true;
         goto out;
     }
     
     /* start the can bus */
     if (can_do_start(ifr.ifr_name) < 0) {
-        std::cout << "Failed to start the CAN bus" << std::endl;
+        Logger::GetLogger()->Log("Failed to start the CAN bus");
         result_.rv = true;
         goto out;
     }
@@ -109,13 +103,12 @@ bool Can::Test()
     sock_addr.can_family = AF_CAN;
     sock_addr.can_ifindex = ifr.ifr_ifindex;
     if ((bind(fd_,(struct sockaddr *)&sock_addr, sizeof(sock_addr))) < 0) {
-        std::cout << "Failed to bind the CAN bus" << std::endl;
+        Logger::GetLogger()->Log("Failed to bind the CAN bus");
         result_.rv = true;
         goto out;
     }
     
-    if (verbose_)
-        std::cout << "Running CAN Test" << std::endl;
+    Logger::GetLogger()->Log("Running CAN Test");
     
     /* send the message */
     memset(&txframe, 0, sizeof(txframe));
@@ -124,7 +117,7 @@ bool Can::Test()
     strncpy(reinterpret_cast<char *>(txframe.data), msg, sizeof(msg));
     rv = write(fd_, &txframe, sizeof(txframe));
     if (rv < 0) {
-        std::cout << "Failed to write to the CAN bus" << std::endl;
+        Logger::GetLogger()->Log("Failed to write to the CAN bus");
         result_.rv = true;
         goto out;
     }
@@ -157,9 +150,6 @@ bool Can::Test()
         
         msg_rec |= (rxframe.data[0] << 8);
         msg_rec |= (rxframe.data[1] << 0);
-        
-        if (verbose_)
-            std::cout << "0x" << std::uppercase << std::hex << msg_rec << std::endl;
         
         /* tesst for match */
         if (msg_rec == CAN_MSG_EXPECTED) {

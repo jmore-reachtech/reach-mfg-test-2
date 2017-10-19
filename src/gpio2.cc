@@ -11,6 +11,7 @@
 
 #include "gpio2.h"
 #include "cmdrunner.h"
+#include "logger.h"
 
 Gpio2::Gpio2(): Connector("Unknown", "/dev/null")
 {
@@ -20,16 +21,11 @@ Gpio2::Gpio2(): Connector("Unknown", "/dev/null")
 Gpio2::Gpio2(std::string connector, std::string device): Connector(connector, device), 
     gpio_42_(), gpio_175_()
 {
-    if (verbose_)
-        std::cout << "Creating GPIO2 conector " << connector << " using device " << device << std::endl;
 }
 
 Gpio2::~Gpio2()
 {
     std::string log;
-
-    if (verbose_)
-        std::cout << "Destroying GPIO2 port" << std::endl; 
 
     if (fd_ > 0) {
         close(fd_);
@@ -57,8 +53,7 @@ bool Gpio2::Test()
     result_.rv = true;
     result_.output.clear();
     
-    if (verbose_)
-        std::cout << "Running UART Test" << std::endl;
+    Logger::GetLogger()->Log("Running GPIO2 Test");
 
     if (!setup_gpio()) {
         result_.output.append("Error setting up GPIO SYS interfaces");
@@ -87,17 +82,16 @@ bool Gpio2::Test()
     tcsetattr(fd_, TCSANOW, &tcs);
 
     if (ioctl(fd_, TIOCGRS485, &rs485conf) < 0) {
-        std::cout << "TIOCGRS485 ioctl failed " << device_ << std::endl;
+        Logger::GetLogger()->Log("TIOCGRS485 ioctl failed " + device_);
     }
     /* enable RS485 mode: */
     rs485conf.flags |= SER_RS485_ENABLED;
 
     if (ioctl(fd_, TIOCSRS485, &rs485conf) < 0) {
-        std::cout << "TIOCSRS485 ioctl failed " << device_ << std::endl;
+        Logger::GetLogger()->Log("TIOCGRS485 ioctl failed " + device_);
     }
 
-    if (verbose_)
-        std::cout << "Opened " << device_ << std::endl;
+    Logger::GetLogger()->Log("Opened " + device_);
     
     /* send the CTS pin counter reset command byte*/
     rv = write(fd_, rst, 1);
@@ -195,11 +189,11 @@ bool Gpio2::setup_gpio()
     
     write(export_fd_, GPIO_PIN_42, sizeof(GPIO_PIN_42));
     if ((gpio_42_.dir_fd = open(SYS_GPIO_42_DIR, O_RDWR)) == -1) {
-        std::cout << "error open 42 dir: " << errno << std::endl;
+        Logger::GetLogger()->Log("Error GPIO open 42");
         return false;
     }
     if ((gpio_42_.val_fd = open(SYS_GPIO_42_VAL, O_RDWR)) == -1) {
-        std::cout << "error open  42 val: " << errno << std::endl;
+        Logger::GetLogger()->Log("Error GPIO val 42");
         return false;
     }
     write(gpio_42_.dir_fd, GPIO_DIR_OUT, sizeof(GPIO_DIR_OUT));
@@ -207,11 +201,11 @@ bool Gpio2::setup_gpio()
     
     write(export_fd_, GPIO_PIN_175, sizeof(GPIO_PIN_175));
     if ((gpio_175_.dir_fd = open(SYS_GPIO_175_DIR, O_RDWR)) == -1) {
-        std::cout << "error open 175 dir: " << errno << std::endl;
+        Logger::GetLogger()->Log("Error GPIO open 175");
         return false;
     }
     if ((gpio_175_.val_fd = open(SYS_GPIO_175_VAL, O_RDWR)) == -1) {
-        std::cout << "error open 175 val: " << errno << std::endl;
+        Logger::GetLogger()->Log("Error GPIO val 175");
         return false;
     }
     write(gpio_175_.dir_fd, GPIO_DIR_OUT, sizeof(GPIO_DIR_OUT));
@@ -256,8 +250,6 @@ bool Gpio2::receiveData(char *buf, int size)
     else if (rv) {
         rv = read(fd_, buf, size);
         if(rv != size) {
-            std::cout << "read " << rv << " bytes, expected " << size << " bytes " 
-                << std::endl;
             result_.output.append("Error: read() failed: ");
             result_.output.append(device_);
             result_.output.append(" (");

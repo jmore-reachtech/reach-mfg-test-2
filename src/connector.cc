@@ -1,19 +1,18 @@
 #include <iostream>
 #include <string>
+#include <sstream>
 
 #include "connector.h"
 
 Connector::Connector(std::string name, std::string device): device_(device),  
-    name_(name), result_(), verbose_(false)
+    name_(name), result_()
 {
-    if (verbose_)
-        std::cout << "Creating Connector: " << name_ << std::endl; 
+
 }
 
 Connector::~Connector()
 {
-    if (verbose_)
-        std::cout << "Destroying Connector: " << name_ << std::endl; 
+
 }
 
 std::string Connector::GetDevice() const
@@ -30,9 +29,17 @@ Connector::connector_result Connector::get_connector_result() const {
     return result_;
 }
 
-void Connector::set_verbose(bool verbose)
+std::string Connector::ToString() const
 {
-    verbose_ = verbose;
+    std::stringstream ss;
+    ss << "Connector: " << this->name_;
+    if (this->result_.rv) {
+        ss << "\t\tFailed";
+    } else {
+        ss << "\t\tPassed";
+    }
+
+    return ss.str();
 }
 
 std::ostream &operator<<(std::ostream &out, const Connector &c)

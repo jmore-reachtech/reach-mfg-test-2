@@ -20,6 +20,7 @@
 #include "beeper.h"
 #include "speaker.h"
 #include "gpio2.h"
+#include "logger.h"
 
 static void showUsage(std::string name)
 {
@@ -44,7 +45,9 @@ static void showUsage(std::string name)
     std::cout << "  TEST_MODULE_GATEWAY                 Module default gateway address" << std::endl;
     std::cout << "                                          Defaults to: not set" << std::endl;
     std::cout << "  TEST_NO_NETWORK_CLOBBER             Do not reset the module IP address" << std::endl;
-    std::cout << "                                          Defaults to: not set" << std::endl << std::endl;
+    std::cout << "                                          Defaults to: not set" << std::endl;
+    std::cout << "  TEST_SHOW_RESULT_OUTPUT             Show the tests results on stdout" << std::endl;
+    std::cout << std::endl;
 }
 
 static void listTests(void)
@@ -97,6 +100,7 @@ static const struct option long_opts[] = {
 
 int main(int argc, char** argv)
 {
+    auto ret            = false;
     auto opt_index      = 0;
     auto opt            = 0;
     auto half_duplex    = false;
@@ -171,6 +175,7 @@ int main(int argc, char** argv)
             break;
         case 'v': // --verbose
             b.SetVerbose(true);
+            Logger::verbose = true;
             break;
         case 'h': // --help
             showUsage(argv[0]);
@@ -255,7 +260,7 @@ int main(int argc, char** argv)
             }
 
             /* Invalid test */
-            std::cout << "Invalid test: " << t << std::endl;
+            Logger::GetLogger()->Log("Invalid Test");
 
             b.Reset();
 
@@ -263,7 +268,8 @@ int main(int argc, char** argv)
         }
     }
 
-    b.Test();
+
+    ret = b.Test();
 
     /* assign mac if set */
     if (mac.length() > 0) {
@@ -277,5 +283,5 @@ int main(int argc, char** argv)
         }
     }
 
-    return 0;
+    return ret;
 }
