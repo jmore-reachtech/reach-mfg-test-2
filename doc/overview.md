@@ -34,7 +34,7 @@
 
 Available Manufacturing Tests
 
-TOUCH     (J0)
+TOUCH     (NA)
 AUART1    (J2)
 AUART3    (J25)
 AUART4    (J21)
@@ -44,11 +44,11 @@ ETHERNET  (J3)
 USB1      (J4)
 USB2      (J5)
 GPIO      (J22)
-FLASH     (J0)
-LCD       (J0)
+FLASH     (NA)
+LCD       (NA)
 BEEPER    (L52)
 SPEAKER   (L52)
-RTC       (J0)
+RTC       (NA)
 GPIO2     (J21)
 ```
 ## TOUCH Test

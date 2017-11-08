@@ -53,7 +53,7 @@ static void showUsage(std::string name)
 static void listTests(void)
 {
     std::cout << std::endl << "Available Manufacturing Tests" << std::endl << std::endl;
-    std::cout << "TOUCH     (J0)" << std::endl;
+    std::cout << "TOUCH     (NA)" << std::endl;
     std::cout << "AUART1    (J2)" << std::endl;
     std::cout << "AUART3    (J25)" << std::endl;
     std::cout << "AUART4    (J21)" << std::endl;
@@ -63,11 +63,11 @@ static void listTests(void)
     std::cout << "USB1      (J4)" << std::endl;
     std::cout << "USB2      (J5)" << std::endl;
     std::cout << "GPIO      (J22)" << std::endl;
-    std::cout << "FLASH     (J0)" << std::endl;
-    std::cout << "LCD       (J0)" << std::endl;
+    std::cout << "FLASH     (NA)" << std::endl;
+    std::cout << "LCD       (NA)" << std::endl;
     std::cout << "BEEPER    (L52)" << std::endl;
     std::cout << "SPEAKER   (L52)" << std::endl;
-    std::cout << "RTC       (J0)" << std::endl;
+    std::cout << "RTC       (NA)" << std::endl;
     std::cout << "GPIO2     (J21)" << std::endl << std::endl;
 }
 
