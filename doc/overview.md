@@ -26,6 +26,7 @@
         								Defaults to: not set
         TEST_NO_NETWORK_CLOBBER 	Do not reset the module IP address
         								Defaults to: not set
+        TEST_SHOW_RESULT_OUTPUT 	Show the test results on stdout
 ```
 ## List Tests
 ```bash
