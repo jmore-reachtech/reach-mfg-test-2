@@ -51,6 +51,15 @@ SPEAKER   (L52)
 RTC       (NA)
 GPIO2     (J21)
 ```
+## Set MAC Address
+- In order to set the MAC address pass in the 6 byte address. The first 3 bytes **(30:68:8C)** is the Reach OUI.
+```bash
+# mfg-test --mac-address 30688C112233
+```
+
+### Expected Results:
+After a power cycle the new MAC address will be set
+
 ## TOUCH Test
 ```bash
 # mfg-test --tests TOUCH
@@ -135,7 +144,7 @@ The **USB** test expects an SD card with one **FAT32** partition to be available
 ### Expected Results:
 The **GPIO** test will walk a 1 across the lower four pins and then the upper four pins. A successful test is a write/read of each pin.
 
-## FLASH (J0) Test
+## FLASH (NA) Test
 ```bash
 # mfg-test --tests FLASH
 ```
@@ -144,7 +153,7 @@ The **FLASH** test will run **nandtest** over each MTD, **/dev/mtd[0-6]**. A suc
 
 **Note:** This test will **read/write** each page and can take up to **8** minutes.
 
-## LCD (J0) Test
+## LCD (NA) Test
 ```bash
 # mfg-test --tests LCD
 ```
@@ -169,7 +178,7 @@ The **BEEPER** test send a tone to the speaker 5 times. Manual inspection is req
 ### Expected Results:
 The **SPEAKER** test plays an audio beep. Manual inspection is required to validate the audio is played correctly.
 
-## RTC (J0) Test
+## RTC (NA) Test
 - The default server address for the **RTC** test is **10.10.10.2**. The sever address can be overwritten by setting the environment variable **TEST_RTC_SERVER_ADDR**.
 
 ```bash
