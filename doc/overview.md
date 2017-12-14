@@ -27,7 +27,29 @@
         TEST_NO_NETWORK_CLOBBER 	Do not reset the module IP address
         								Defaults to: not set
         TEST_SHOW_RESULT_OUTPUT 	Show the test results on stdout
+        								Defaults to: not set
 ```
+
+## Environment Usage
+- For login session persistence
+```bash 
+	export TEST_WEB_SERVER_ADDR=192.168.0.1
+    export TEST_RTC_SERVER_ADDR=192.168.0.1
+    export TEST_MODULE_ADDR=192.168.0.5
+    export TEST_MODULE_GATEWAY=192.168.0.1
+    export TEST_NO_NETWORK_CLOBBER=y
+    export TEST_SHOW_RESULT_OUTPUT=y
+```
+- For one time process
+```bash 
+	TEST_WEB_SERVER_ADDR=192.168.0.1 mfg-test --tests XXX
+    TEST_RTC_SERVER_ADDR=192.168.0.1 mfg-test --tests XXX
+    TEST_MODULE_ADDR=192.168.0.5 mfg-test --tests XXX
+    TEST_MODULE_GATEWAY=192.168.0.1 mfg-test --tests XXX
+    TEST_NO_NETWORK_CLOBBER=y mfg-test --tests XXX
+    TEST_SHOW_RESULT_OUTPUT=y mfg-test --tests XXX
+```
+
 ## List Tests
 ```bash
 # mfg-test --list-tests
