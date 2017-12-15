@@ -65,8 +65,8 @@ static void listTests(void)
     std::cout << "GPIO      (J22)" << std::endl;
     std::cout << "FLASH     (NA)" << std::endl;
     std::cout << "LCD       (NA)" << std::endl;
-    std::cout << "BEEPER    (L52)" << std::endl;
-    std::cout << "SPEAKER   (L52)" << std::endl;
+    std::cout << "BEEPER    (LS2)" << std::endl;
+    std::cout << "SPEAKER   (LS1)" << std::endl;
     std::cout << "RTC       (NA)" << std::endl;
     std::cout << "GPIO2     (J21)" << std::endl << std::endl;
 }

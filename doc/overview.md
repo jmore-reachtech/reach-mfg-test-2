@@ -68,8 +68,8 @@ USB2      (J5)
 GPIO      (J22)
 FLASH     (NA)
 LCD       (NA)
-BEEPER    (L52)
-SPEAKER   (L52)
+BEEPER    (LS2)
+SPEAKER   (LS1)
 RTC       (NA)
 GPIO2     (J21)
 ```
@@ -182,7 +182,7 @@ The **FLASH** test will run **nandtest** over each MTD, **/dev/mtd[0-6]**. A suc
 ### Expected Results:
 The **LCD** test will write an image to the framebuffer. Manual inspection is required to validate the image rendering is correct.
 
-## BEEPER (L52) Test
+## BEEPER (LS2) Test
 - Partial stuff boards only
 
 ```bash
@@ -191,7 +191,7 @@ The **LCD** test will write an image to the framebuffer. Manual inspection is re
 ### Expected Results:
 The **BEEPER** test send a tone to the speaker 5 times. Manual inspection is required to validate the tone is correct.
 
-## SPEAKER (L52) Test
+## SPEAKER (LS1) Test
 - Full stuff boards only
 
 ```bash
