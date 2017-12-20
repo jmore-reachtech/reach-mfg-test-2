@@ -1,6 +1,6 @@
 ## Manufacturing Test
 ```bash
-# mfg--test --help
+# mfg-test --help
 	Perform Manufacturing Test
     
     Usage: mfg-test [options]
@@ -28,6 +28,14 @@
         								Defaults to: not set
         TEST_SHOW_RESULT_OUTPUT 	Show the test results on stdout
         								Defaults to: not set
+```
+
+## Return code
+- The mfg-test returns 0 for success and 1 for failure for all operations
+- For multiple tests the results for each test are OR'ed
+- See bash last return code stored in **$?**
+```bash 
+	mfg-test --tests LCD; echo $?;
 ```
 
 ## Environment Usage
