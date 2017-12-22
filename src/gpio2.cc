@@ -103,9 +103,13 @@ bool Gpio2::Test()
         result_.rv = true;
         goto out;
     }
-    /* we get 2 bytes back */
-    if (receiveData(recv, 2)) {
-        std::cout << "error after rst recv " << device_ << std::endl;
+
+    /* we get 2 bytes back; just read 1 byte at a time */
+    //TODO: fix receiveData to wait for both bytes
+    if (receiveData(recv,1)) {
+        goto out;
+    }
+    if (receiveData(&recv[1],1)) {
         goto out;
     }
     /* both bytes should be 0x0 */
