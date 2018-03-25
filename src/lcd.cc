@@ -68,7 +68,7 @@ bool Lcd::Test()
 
     /* Map the device to memory */
     fbp = (char *)mmap(0, screensize, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
-    if ((int)fbp == -1) {
+    if (fbp == MAP_FAILED) {
         Logger::GetLogger()->Log("LCD mmap failed");
         return true;
     }
