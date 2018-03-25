@@ -9,7 +9,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 
-#include "can.h"
+#include "canlocal.h"
 #include "libsocketcan.h"
 #include "cmdrunner.h"
 #include "logger.h"
@@ -85,7 +85,7 @@ bool Can::Test()
     }
     
     /* set the bitrate */
-    if (can_set_bitrate(ifr.ifr_name, CAN_BAUD_RATE) < 0) {
+    if (can_set_bitrate(ifr.ifr_name, CANLOCAL_BAUD_RATE) < 0) {
         Logger::GetLogger()->Log("Failed to set the CAN bus bitrate");
         result_.rv = true;
         goto out;
@@ -152,7 +152,7 @@ bool Can::Test()
         msg_rec |= (rxframe.data[1] << 0);
         
         /* tesst for match */
-        if (msg_rec == CAN_MSG_EXPECTED) {
+        if (msg_rec == CANLOCAL_MSG_EXPECTED) {
             result_.rv = false;
         } else {
             result_.output.append("Frame mismatch: ");

@@ -9,7 +9,7 @@
 #include "board.h"
 #include "uart.h"
 #include "i2c.h"
-#include "can.h"
+#include "canlocal.h"
 #include "ethernet.h"
 #include "usb.h"
 #include "gpio.h"

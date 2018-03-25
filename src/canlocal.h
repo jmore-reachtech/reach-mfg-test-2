@@ -1,13 +1,13 @@
-#ifndef CAN_H
-#define CAN_H
+#ifndef CANLOCAL_H
+#define CANLOCAL_H
 
 #include <string>
 
 #include "connector.h"
 
-#define CAN_IF "can0"
-#define CAN_BAUD_RATE 500000
-#define CAN_MSG_EXPECTED 0xBEEF
+#define CANLOCAL_IF "can0"
+#define CANLOCAL_BAUD_RATE 500000
+#define CANLOCAL_MSG_EXPECTED 0xBEEF
 
 class Can: public Connector {
 
