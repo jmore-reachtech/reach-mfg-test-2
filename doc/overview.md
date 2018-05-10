@@ -76,6 +76,11 @@ USB2      (J5)
 GPIO      (J22)
 FLASH     (NA)
 LCD       (NA)
+LCD_R     (NA)
+LCD_G     (NA)
+LCD_B     (NA)
+LCD_L     (NA)
+LCD_W     (NA)
 BEEPER    (LS2)
 SPEAKER   (LS1)
 RTC       (NA)
@@ -189,6 +194,41 @@ The **FLASH** test will run **nandtest** over each MTD, **/dev/mtd[0-6]**. A suc
 ```
 ### Expected Results:
 The **LCD** test will write an image to the framebuffer. Manual inspection is required to validate the image rendering is correct.
+
+## LCD_R (NA) Test
+```bash
+# mfg-test --tests LCD_R
+```
+### Expected Results:
+The **LCD_R** test will write **RED** to the framebuffer. Manual inspection is required to validate the image rendering is correct.
+
+## LCD_G (NA) Test
+```bash
+# mfg-test --tests LCD_G
+```
+### Expected Results:
+The **LCD_G** test will write **GREEN** to the framebuffer. Manual inspection is required to validate the image rendering is correct.
+
+## LCD_B (NA) Test
+```bash
+# mfg-test --tests LCD_B
+```
+### Expected Results:
+The **LCD_B** test will write **BLUE** to the framebuffer. Manual inspection is required to validate the image rendering is correct.
+
+## LCD_L (NA) Test
+```bash
+# mfg-test --tests LCD_L
+```
+### Expected Results:
+The **LCD_L** test will write **BLACK** to the framebuffer. Manual inspection is required to validate the image rendering is correct.
+
+## LCD_W (NA) Test
+```bash
+# mfg-test --tests LCD_W
+```
+### Expected Results:
+The **LCD_W** test will write **WHITE** to the framebuffer. Manual inspection is required to validate the image rendering is correct.
 
 ## BEEPER (LS2) Test
 - Partial stuff boards only
