@@ -12,7 +12,7 @@ Lcd::Lcd(): Connector("Unknown", "/dev/null")
 {
 }
 
-Lcd::Lcd(std::string connector, std::string device): Connector(connector, device)
+Lcd::Lcd(std::string connector, std::string device, Color color): Connector(connector, device), color(color)
 {
 }
 
@@ -29,19 +29,7 @@ bool Lcd::Test()
     struct fb_fix_screeninfo finfo;
     long int screensize 	= 0;
     char *fbp 				= 0;
-    uint32_t x              = 0;
-    uint32_t y			    = 0;
-    uint32_t j			    = 0;
-    long int location 		= 0;
-    std::size_t ret		    = 0;
 
-    FILE *image;
-    BITMAPFILEHEADER bfh;
-    BITMAPINFOHEADER bih;
-
-    memset(&bfh,0,sizeof(BITMAPFILEHEADER));
-    memset(&bih,0,sizeof(BITMAPINFOHEADER));
-    
     /* Open the file for reading and writing */
     fbfd = open("/dev/fb0", O_RDWR);
     if (fbfd == -1) {
@@ -73,11 +61,49 @@ bool Lcd::Test()
         return true;
     }
     
+
+    switch (this->color) {
+        case Image:
+            copyImage(fbp, vinfo, finfo);break;
+        case Red:
+            copyColor(fbp, vinfo, finfo, 0xff, 0x0, 0x0);break;
+        case Green:
+            copyColor(fbp, vinfo, finfo, 0x0, 0x0, 0xff);break;
+        case Blue:
+            copyColor(fbp, vinfo, finfo, 0x0, 0xff, 0x0);break;
+        case Black:
+            copyColor(fbp, vinfo, finfo, 0x0, 0x0, 0x0);break;
+        case White:
+            copyColor(fbp, vinfo, finfo, 0xff, 0xff, 0xff);break;
+        default:
+            std::cout << "Unsupported LCD Color" << std::endl;
+    }
+
+    munmap(fbp, screensize);
+    close(fbfd);
+
+    return false;
+}
+
+
+bool Lcd::copyImage(char *fbp, struct fb_var_screeninfo vinfo, struct fb_fix_screeninfo finfo)
+{
+    FILE *image;
+    uint32_t x              = 0;
+    uint32_t y			    = 0;
+    uint32_t j			    = 0;
+    std::size_t ret		    = 0;
+    long int location 		= 0;
+    
+    BITMAPFILEHEADER bfh;
+    BITMAPINFOHEADER bih;
+
+    memset(&bfh,0,sizeof(BITMAPFILEHEADER));
+    memset(&bih,0,sizeof(BITMAPINFOHEADER));
+    
     if(!(image = fopen("/usr/share/mfg-test/fruit_girl.bmp", "rb+")))
     {
         Logger::GetLogger()->Log("LCD error opening image file");
-        munmap(fbp, screensize);
-        close(fbfd);
         return true;
     }
     
@@ -168,9 +194,30 @@ bool Lcd::Test()
     }
     
     fclose(image);
-    munmap(fbp, screensize);
-    close(fbfd);
 
     return false;
 }
 
+bool Lcd::copyColor(char *fbp, struct fb_var_screeninfo vinfo, struct fb_fix_screeninfo finfo, int r, int b, int g)
+{
+    uint32_t x              = 0;
+    uint32_t y			    = 0;
+    long int location 		= 0;
+    long int screensize     = 0;
+
+    location = (x+vinfo.xoffset) * (vinfo.bits_per_pixel/8) +
+        (y+vinfo.yoffset) * finfo.line_length;
+
+    screensize = vinfo.xres * vinfo.yres * vinfo.bits_per_pixel / 8;
+
+    while ( location < screensize)
+	{
+		*(fbp + location) = b;          /* blue         */
+		*(fbp + location + 1) = g;      /* green        */
+		*(fbp + location + 2) = r;      /* red          */
+		*(fbp + location + 3) = 0x0;    /* transparency */
+		location += 4;
+	}
+
+    return false;
+}

@@ -113,17 +113,29 @@ typedef struct {
     uint8_t red;
 } PIXEL;
 
+
 class Lcd: public Connector
 {
 public:
+    enum Color {
+        Red = 1,
+        Blue,
+        Green,
+        Black,
+        White,
+        Image
+    };
+
     Lcd();
-    Lcd(std::string connector, std::string device);
+    Lcd(std::string connector, std::string device, Color color);
     virtual ~Lcd();
     
     virtual bool Test();
 
 private:
-
+    bool copyImage(char *fb, struct fb_var_screeninfo vinfo, struct fb_fix_screeninfo finfo);
+    bool copyColor(char *fb, struct fb_var_screeninfo vinfo, struct fb_fix_screeninfo finfo, int r, int b, int g);
+    Color color;
 };
 
 #endif // LCD_H_

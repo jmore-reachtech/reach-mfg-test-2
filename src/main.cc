@@ -65,6 +65,11 @@ static void listTests(void)
     std::cout << "GPIO      (J22)" << std::endl;
     std::cout << "FLASH     (NA)" << std::endl;
     std::cout << "LCD       (NA)" << std::endl;
+    std::cout << "LCD_R     (NA)" << std::endl;
+    std::cout << "LCD_G     (NA)" << std::endl;
+    std::cout << "LCD_B     (NA)" << std::endl;
+    std::cout << "LCD_L     (NA)" << std::endl;
+    std::cout << "LCD_W     (NA)" << std::endl;
     std::cout << "BEEPER    (LS2)" << std::endl;
     std::cout << "SPEAKER   (LS1)" << std::endl;
     std::cout << "RTC       (NA)" << std::endl;
@@ -162,7 +167,7 @@ int main(int argc, char** argv)
                 std::cout << image << std::endl;
                 return 0;
             case 7: // --version
-                std::cout << "Version 1.0.3" << std::endl;
+                std::cout << "Version 1.0.4" << std::endl;
                 return 0;
             default:
                 return 1;
@@ -239,7 +244,27 @@ int main(int argc, char** argv)
                 continue;
             }
             if(t == "LCD") {
-                b.AddConnector(new Lcd("LCD", "/dev/fb0"));
+                b.AddConnector(new Lcd("LCD", "/dev/fb0", Lcd::Image));
+                continue;
+            }
+            if(t == "LCD_R") {
+                b.AddConnector(new Lcd("LCD", "/dev/fb0", Lcd::Red));
+                continue;
+            }
+            if(t == "LCD_G") {
+                b.AddConnector(new Lcd("LCD", "/dev/fb0", Lcd::Green));
+                continue;
+            }
+            if(t == "LCD_B") {
+                b.AddConnector(new Lcd("LCD", "/dev/fb0", Lcd::Blue));
+                continue;
+            }
+            if(t == "LCD_L") {
+                b.AddConnector(new Lcd("LCD", "/dev/fb0", Lcd::Black));
+                continue;
+            }
+            if(t == "LCD_W") {
+                b.AddConnector(new Lcd("LCD", "/dev/fb0", Lcd::White));
                 continue;
             }
             if(t == "RTC") {
