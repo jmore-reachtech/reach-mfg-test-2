@@ -167,7 +167,7 @@ int main(int argc, char** argv)
                 std::cout << image << std::endl;
                 return 0;
             case 7: // --version
-                std::cout << "Version 1.0.4" << std::endl;
+                std::cout << "Version 1.0.5" << std::endl;
                 return 0;
             default:
                 return 1;
